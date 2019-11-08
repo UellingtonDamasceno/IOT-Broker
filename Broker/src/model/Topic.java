@@ -1,13 +1,12 @@
 package model;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import model.exceptions.TopicExistException;
+import model.exceptions.ClientExistException;
+import org.json.JSONObject;
 
 /**
  *
@@ -16,67 +15,89 @@ import model.exceptions.TopicExistException;
 public class Topic {
 
     private final String id;
-    private final String name;
-    private int subscriptions;
-
-    private ServerSocket topic; //Coração do server
-    private Map<String, Subscriper> subscripers; //Lista de clientes conectados nesse server
+    private Map<String, Client> publishers;
+    private Map<String, Client> subscripers; //Lista de clientes conectados nesse server
 
     public Topic(String id, String name) {
         this.id = id;
-        this.name = name;
-        this.subscriptions = 0;
-        this.subscripers = new HashMap(31);
+        this.subscripers = new HashMap();
+        this.publishers = new HashMap();
     }
 
     public String getId() {
         return this.id;
     }
 
-    public String getName() {
-        return this.name;
+    public void patchPublisher(String publisherID, Client publisher) throws ClientExistException {
+        this.patch(publisherID, this.publishers, publisher);
     }
 
-    public boolean thisServerExists() {
-        return (this.topic != null);
+    public void patchSubscriper(String subscriperID, Client subscriper) throws ClientExistException {
+        this.patch(subscriperID, this.subscripers, subscriper);
     }
 
-    public void addSubscriper(String subscriperID, Subscriper subscriper) throws TopicExistException {
-        if (this.subscripers.containsKey(subscriperID)) {
-            throw new TopicExistException();
+    public void deletePublisher(String publisherID) throws IOException {
+        this.delete(publisherID, this.publishers);
+    }
+
+    public void deleteSubscriper(String subscriperID) throws IOException {
+        this.delete(subscriperID, this.subscripers);
+    }
+
+    public void notifyAllPublisher(String response) {
+        this.notifyAll(this.publishers.values().iterator(), response);
+    }
+
+    public void notifyAllSubscripers(String response) {
+        this.notifyAll(this.subscripers.values().iterator(), response);
+    }
+
+    private void delete(String id, Map<String, Client> customers) throws IOException {
+        Client client = customers.remove(id);
+        client.deleteObservers();
+        client.close();
+    }
+
+    private void patch(String id, Map<String, Client> customers, Client client) throws ClientExistException {
+        if (customers.containsKey(id)) {
+            throw new ClientExistException();
         }
-        this.subscripers.put(subscriperID, subscriper);
-        this.subscriptions++;
+        customers.put(id, client);
     }
 
-    public boolean createTopic(int port) throws IOException {
-        boolean started = false;
-        if (this.topic == null) {
-            this.topic = new ServerSocket(port);
-            started = true;
-        }
-        return started;
+    public void close() throws IOException {
+        this.close(publishers);
+        this.close(subscripers);
     }
 
-    public boolean createTopic(int port, int ip) throws IOException {
-        boolean started = false;
-        if (this.topic == null) {
-            this.topic = new ServerSocket(port, ip);
-            started = true;
+    private void notifyAll(Iterator<Client> customers, String response) {
+        while (customers.hasNext()) {
+            Client currentClient = customers.next();
+            try {
+                currentClient.write(response);
+            } catch (IOException ex) {
+                System.out.println("Erro: Model > Topic > NotifyAll");
+            }
         }
-        return started;
     }
 
-    /**
-     * Questão: Existe algum tratamento especial ao para fechar um server? Close
-     * the server.
-     *
-     * @throws java.io.IOException
-     */
-    public void closeTopic() throws IOException {
-        if (!this.topic.isClosed()) {
-            this.topic.close();
+    private void close(Map<String, Client> customers) throws IOException {
+        for (Client currentClient : customers.values()) {
+            currentClient.write("Mensagem para informar que está sendo finalizado");
+            currentClient.close();
+            /**
+             * Método close connection dos subscripers também está avisando que
+             * a conexão está sendo fechada.
+             *
+             * --- Tbm pode ter algo de errado nesse método. será necessario
+             * ficar atento a condição de corrida é possivel que estejamos
+             * tentando manipular uma estrutura de dados enquanto estamos
+             * pecorrendo-a
+             *
+             */
+
         }
+        customers.clear();
     }
 
     @Override
@@ -90,40 +111,17 @@ public class Topic {
     public boolean equals(Object obj) {
         if (obj instanceof Topic) {
             Topic other = (Topic) obj;
-            return (this.topic.hashCode() == other.hashCode());
+            return (this.hashCode() == other.hashCode());
         }
         return false;
     }
-
-    public void run() {
-        try {
-            Socket socket = this.topic.accept();
-            Subscriper client = new Subscriper(socket);
-            client.startClient();
-
-            this.addSubscriper("Client" + this.subscriptions, client);
-            new Thread(client).start();
-
-            System.out.println("Novo tópico cadastrado");
-
-        } catch (IOException ex) {
-            System.out.println("Erro de IO");
-        } catch (TopicExistException ex) {
-            System.out.println("Topic já existe");
-        }
-    }
-
-    public void notifyAllSubscripers(String response) {
-        Iterator allSubscripers = this.subscripers.values().iterator();
-        
-        while (allSubscripers.hasNext()) {
-            Subscriper currentSubscriper = (Subscriper) allSubscripers.next();
-
-            try {
-                currentSubscriper.write(response + '\n');
-            } catch (IOException ex) {
-                System.out.println("Erro ao enviar mensagem");
-            }
-        }
+    
+    @Override
+    public String toString(){
+        JSONObject topic = new JSONObject();
+        topic.append("id", this.id);
+        topic.put("publishers", this.publishers);
+        topic.put("subscripers", this.subscripers);
+        return topic.toString();
     }
 }

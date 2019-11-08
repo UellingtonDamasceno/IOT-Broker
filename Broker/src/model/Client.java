@@ -6,31 +6,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.LinkedList;
 import java.util.Observable;
-import java.util.Observer;
-import java.util.Queue;
 
 /**
  *
  * @author Uellington Damasceno
  */
-public class Subscriper extends Observable implements Runnable {
-
-    private final int MAX_REQUEST = 5;
+public class Client extends Observable implements Runnable {
 
     private final Socket socket;
 
     private BufferedReader reader;
     private BufferedWriter writer;
 
-    private Queue<String> requests;
-
+    
     private boolean online;
 
-    public Subscriper(Socket socket) {
+    public Client(Socket socket) {
         this.socket = socket;
-        this.requests = new LinkedList();
         this.online = false;
     }
 
@@ -38,22 +31,28 @@ public class Subscriper extends Observable implements Runnable {
         return online;
     }
 
-    public void startClient() throws IOException {
+     
+    public void start() throws IOException {
         InputStreamReader is = new InputStreamReader(this.socket.getInputStream());
         this.reader = new BufferedReader(is);
 
         OutputStreamWriter ot = new OutputStreamWriter(this.socket.getOutputStream());
         this.writer = new BufferedWriter(ot);
-        
+
         this.online = true;
     }
 
-    public void closeConnection() {
+    public void close() throws IOException {
+        //this.writer(avisar que a conexão será finalizada);
+        this.writer.close();
+        this.reader.close();
+        this.socket.close();
         this.online = false;
         //Instruções relacionadas observer para remover o objeto
     }
 
     private String read() throws IOException {
+        
         StringBuilder request = new StringBuilder("");
         int buffer = -1;
         while (buffer != '\n') {
@@ -61,52 +60,34 @@ public class Subscriper extends Observable implements Runnable {
             request.append((char) buffer);
             System.out.println(request);
         }
-        //requests.add(str.toString().trim());
-        return request.toString();//requests.peek();
+        return request.toString();
     }
 
     public void write(String response) throws IOException {
-        System.out.println("Enviando...");
         this.writer.write(response);
         this.writer.flush();
-        System.out.println("Enviada");
-    }
-
-    public boolean canAcceptRequest() {
-        return (requests.size() < MAX_REQUEST);
-    }
-
-    public void addNewObserver(Observer o) {
-        this.addObserver(o);
     }
 
     @Override
     public void run() {
         String message;
         while (this.online) {
-            if (this.canAcceptRequest()) {
-                try {
-                    System.out.println("Estou aguardando mensagem");
-                    message = this.read();
-                    
-                    if (message != null && !(message.isEmpty())) {
-                        //this.write(message);
-                        this.setChanged();
-                        this.notifyObservers(message);
-                    }
-                } catch (IOException ex) {
-                    System.out.println("Falha ao conectar");
-                    this.online = false;
+            try {
+                message = this.read();
+                if (message != null && !(message.isEmpty())) {
+                    this.setChanged();
+                    this.notifyObservers(message);
                 }
-            } else {
-
+            } catch (IOException ex) {
+                System.out.println("Falha ao conectar");
+                this.online = false;
             }
         }
     }
-    
+
     @Override
-    public String toString(){
-        return this.socket.getLocalAddress().toString();
+    public String toString() {
+        return ((String) socket.getRemoteSocketAddress().toString().replace("/", ""));
     }
 
 }

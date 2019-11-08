@@ -1,93 +1,77 @@
 package model;
 
-import model.exceptions.PublisherNotExistException;
-import model.exceptions.UnintializedObjectException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.lang.Runnable;
+import java.util.Observable;
 
 /**
  *
  * @author Uellington Damasceno
  */
-public class Publisher implements Runnable {
-    private final String id;
-    
+abstract public class Publisher extends Observable implements Runnable {
+
     private Socket socket;
-    
+
     private BufferedReader reader;
     private BufferedWriter writer;
     
-    private boolean online;
-    
-    public Publisher(String id){
-        this.id = id;
-        this.online = false;
+    protected boolean isConnected(){
+        return (this.socket != null);
     }
     
-    public boolean exist(){
-        return online;
-    }   
-       
-    public void startPublisher(Socket socket) throws IOException, PublisherNotExistException{
-        if(!this.exist()){
-            this.socket = socket;
-            
-            InputStreamReader isr = new InputStreamReader(this.socket.getInputStream());
-            this.reader = new BufferedReader(isr);
-            
-            OutputStreamWriter osw = new OutputStreamWriter(this.socket.getOutputStream());
-            this.writer = new BufferedWriter(osw);
-            
-            this.online = true;
-        }
-        throw new PublisherNotExistException();
+    protected void start(Socket socket) throws IOException {
+        this.socket = socket;
+  
+        InputStreamReader isr = new InputStreamReader(this.socket.getInputStream());
+        this.reader = new BufferedReader(isr);
+
+        OutputStreamWriter osw = new OutputStreamWriter(this.socket.getOutputStream());
+        this.writer = new BufferedWriter(osw);
     }
 
-    public String read() throws IOException, UnintializedObjectException{
-        if(this.online){
-            StringBuilder message = new StringBuilder("");
-            int buffer = -1;
-            
-            while(buffer != '\n'){
-                buffer = this.reader.read();
-                message.append(((char)buffer));
-            }
-            return message.toString();
+    private String read() throws IOException {
+        StringBuilder message = new StringBuilder("");
+        int buffer = -1;
+
+        while (buffer != '\n') {
+            buffer = this.reader.read();
+            message.append(((char) buffer));
         }
-        throw new UnintializedObjectException();
+        return message.toString();
     }
-    
-    public void write(String response) throws IOException, UnintializedObjectException{
-        if(this.online){
-            this.writer.write(response);
-            this.writer.flush();
-        }
-        throw new UnintializedObjectException();
+
+    protected void write(String response) throws IOException {
+        this.writer.write(response);
+        this.writer.flush();
     }
+
     
-    
-    public void closeConnection() throws IOException{
+    protected void close() throws IOException {
+        /**
+         * Avisou ao server que ele será desconectado?
+         */
         this.writer.close();
         this.reader.close();
         this.socket.close();
-        this.online = false;
     }
-    
+
     @Override
     public void run() {
         String message;
-        while(true){
+        while (!this.socket.isClosed()) {
             try {
-                message = this.read();
+                message = Publisher.this.read();
+                this.setChanged();
+                this.notifyObservers(message);
             } catch (IOException ex) {
                 System.out.println("Desconectado");
-            } catch (UnintializedObjectException ex) {
-                System.out.println("Inicialize o objeto!");
             }
         }
     }
+
 }
