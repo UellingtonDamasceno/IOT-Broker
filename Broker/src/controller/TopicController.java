@@ -3,8 +3,9 @@ package controller;
 import model.exceptions.InexistentKeyException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import model.Client;
 import model.Topic;
 import model.exceptions.ClientExistException;
@@ -14,7 +15,7 @@ import org.json.JSONObject;
  *
  * @author Uellington Damasceno
  */
-public class TopicController {
+public class TopicController implements Observer{
 
     /**
      * permitir que o publisher fique offline (Avisando aos subscripers quando
@@ -33,7 +34,8 @@ public class TopicController {
     }
 
     //
-    public synchronized void postTopic(String topicID, Topic topic) {
+    public synchronized void postTopic(String topicID) {
+        Topic topic = new Topic(topicID);
         this.topics.put(topicID, topic);
     }
 
@@ -53,18 +55,19 @@ public class TopicController {
 
     public synchronized String getTopics() {
         JSONObject topicsJSON = new JSONObject();
-        topicsJSON.put("topics", topicsJSON);
+        topicsJSON.accumulate("hasTopic", !this.topics.isEmpty());
+        topicsJSON.put("topics", this.topics);
         return topicsJSON.toString();
     }
 
-    public synchronized void postSubscripe(String topicID, String subscriperID, Client subscriper) throws ClientExistException {
+    public synchronized void postSubscripe(String topicID, Client subscriber) throws ClientExistException {
         Topic topic = this.topics.get(topicID);
-        topic.patchSubscriper(subscriperID, subscriper);
+        topic.patchSubscriper(subscriber.getID(), subscriber);
     }
-    
-    public synchronized void postPublisher( String topicID, String publisherID, Client publisher) throws ClientExistException{
+     
+    public synchronized void postPublisher( String topicID, Client publisher) throws ClientExistException{
         Topic topic = this.topics.get(topicID);
-        topic.patchPublisher(publisherID, publisher);
+        topic.patchPublisher(publisher.getID(), publisher);
     }
     
     public synchronized void deleteSubscripe(String topicID, String subscriperID) throws IOException {
@@ -94,5 +97,33 @@ public class TopicController {
             current.close();
         }
         this.topics.clear();
+    }
+    
+        /**
+     * Outra opção seria fazer o controller de tópico
+     */
+    @Override
+    public void update(Observable observable, Object object) {
+        String request = (String) object;
+        String response;
+
+        switch (request) {
+            case "POST/TOPIC": {
+                
+                //response = this.createTopic(request);
+                break;
+            }case "POST/PUBLISHER":{
+                //response = this.createPublisher(request);
+            }case "POST/SUBSCRIBER":{
+                //response = this.createSubscriper(request);
+            }case "GET/TOPICS":{
+                
+            }case "DELETE/TOPIC":{
+            }
+            default: {
+                response = "404";
+            }
+        }
+        //((Client)observable).write(response);
     }
 }

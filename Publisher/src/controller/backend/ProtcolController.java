@@ -1,6 +1,6 @@
 package controller.backend;
 
-import model.SmartDevice;
+import model.Device;
 import org.json.JSONObject;
 
 /**
@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * @author Uellington Damasceno
  */
 public class ProtcolController {
-    public SmartDevice createDevice(String json){
+    public Device createDevice(String json){
         JSONObject smart = new JSONObject(json);
         System.out.println(smart.get("brand"));
         return null;

@@ -1,9 +1,9 @@
 package view;
 
-import net.ServerBroker;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import facade.Facade;
 
 /**
  *
@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            ServerBroker.getInstance().initialize(9999);
+            Facade.getInstance().initialize(9999);
         } catch (IOException ex) {
             System.out.println("Não inicializado");
         }

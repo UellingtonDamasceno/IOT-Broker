@@ -11,7 +11,7 @@ import org.json.JSONObject;
  *
  * @author Uellington Damasceno
  */
-public abstract class SmartDevice extends Publisher {
+public class Device extends Smart {
     
     private final String brand;
     private final String type;
@@ -19,7 +19,7 @@ public abstract class SmartDevice extends Publisher {
     private boolean online;
     private boolean standBy;
 
-    public SmartDevice(String type, String brand, String model) {
+    public Device(String type, String brand, String model) {
         this.type = type;
         this.brand = brand;
         this.model = model;
@@ -48,7 +48,7 @@ public abstract class SmartDevice extends Publisher {
      * @throws DeviceOfflineException
      * @throws DeviceStandByException 
      */
-    public void sendResponse(String response) throws IOException, DeviceOfflineException, DeviceStandByException {
+    public void send(String response) throws IOException, DeviceOfflineException, DeviceStandByException {
         if (this.online && !this.standBy) {
             this.write(response);
         } else if(!this.online){

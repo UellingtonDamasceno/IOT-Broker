@@ -18,7 +18,7 @@ public class Topic {
     private Map<String, Client> publishers;
     private Map<String, Client> subscripers; //Lista de clientes conectados nesse server
 
-    public Topic(String id, String name) {
+    public Topic(String id) {
         this.id = id;
         this.subscripers = new HashMap();
         this.publishers = new HashMap();
@@ -66,18 +66,14 @@ public class Topic {
     }
 
     public void close() throws IOException {
-        this.close(publishers);
+        //this.close(publishers);
         this.close(subscripers);
     }
 
     private void notifyAll(Iterator<Client> customers, String response) {
         while (customers.hasNext()) {
             Client currentClient = customers.next();
-            try {
-                currentClient.write(response);
-            } catch (IOException ex) {
-                System.out.println("Erro: Model > Topic > NotifyAll");
-            }
+            currentClient.write(response);
         }
     }
 
@@ -121,7 +117,7 @@ public class Topic {
         JSONObject topic = new JSONObject();
         topic.append("id", this.id);
         topic.put("publishers", this.publishers);
-        topic.put("subscripers", this.subscripers);
+        topic.put("subscribers", this.subscripers);
         return topic.toString();
     }
 }

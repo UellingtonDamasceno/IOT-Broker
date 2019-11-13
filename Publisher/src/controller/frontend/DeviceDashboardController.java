@@ -3,6 +3,8 @@ package controller.frontend;
 import facade.FacadeBackend;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,7 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import model.SmartDevice;
+import model.Device;
 import model.exceptions.NetworkNotConfiguredException;
 
 /**
@@ -19,7 +21,7 @@ import model.exceptions.NetworkNotConfiguredException;
  *
  * @author Uellington Damasceno
  */
-public class DashboardController implements Initializable {
+public class DeviceDashboardController implements Initializable, Observer {
 
     @FXML
     private Button btnInfo;
@@ -32,7 +34,7 @@ public class DashboardController implements Initializable {
     @FXML
     private VBox vboxContent;
 
-    private SmartDevice smart;
+    private Device smart;
 
     /**
      * Initializes the controller class.
@@ -40,6 +42,7 @@ public class DashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.smart = FacadeBackend.getInstance().getSmartDevice();
+        smart.addObserver(this);
     }
 
     @FXML
@@ -63,9 +66,9 @@ public class DashboardController implements Initializable {
         try {
             FacadeBackend.getInstance().restart();
         } catch (IOException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DeviceDashboardController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NetworkNotConfiguredException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DeviceDashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -88,10 +91,14 @@ public class DashboardController implements Initializable {
                 this.smart.on();
             }
         } catch (IOException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DeviceDashboardController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NetworkNotConfiguredException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DeviceDashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void update(Observable o, Object o1) {
     }
 
 }

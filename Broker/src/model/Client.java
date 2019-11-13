@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Observable;
+import org.json.JSONObject;
 
 /**
  *
@@ -14,24 +15,28 @@ import java.util.Observable;
  */
 public class Client extends Observable implements Runnable {
 
+    private final String id;
     private final Socket socket;
 
     private BufferedReader reader;
     private BufferedWriter writer;
 
-    
     private boolean online;
 
     public Client(Socket socket) {
         this.socket = socket;
+        this.id = ((String) socket.getRemoteSocketAddress().toString().replace("/", ""));
         this.online = false;
     }
-
+    
+    public String getID(){
+        return this.id;
+    }
+    
     public boolean isOnline() {
         return online;
     }
 
-     
     public void start() throws IOException {
         InputStreamReader is = new InputStreamReader(this.socket.getInputStream());
         this.reader = new BufferedReader(is);
@@ -52,7 +57,7 @@ public class Client extends Observable implements Runnable {
     }
 
     private String read() throws IOException {
-        
+
         StringBuilder request = new StringBuilder("");
         int buffer = -1;
         while (buffer != '\n') {
@@ -63,9 +68,23 @@ public class Client extends Observable implements Runnable {
         return request.toString();
     }
 
-    public void write(String response) throws IOException {
-        this.writer.write(response);
-        this.writer.flush();
+    public synchronized void write(String response) {
+        Runnable send = () -> {
+            int uploadAttempets = 5;
+            boolean sended = false;
+            while (uploadAttempets != 0 || !sended) {
+                try {
+                    this.writer.write(response);
+                    this.writer.flush();
+                    sended = true;
+                } catch (IOException ex) {
+                    System.out.println("Deu merda ao enviar a mensagem");
+                    uploadAttempets --;
+                }
+                //Colocar um sleep;
+            }
+        };
+        new Thread(send).start();
     }
 
     @Override
@@ -87,7 +106,10 @@ public class Client extends Observable implements Runnable {
 
     @Override
     public String toString() {
-        return ((String) socket.getRemoteSocketAddress().toString().replace("/", ""));
+        JSONObject json = new JSONObject();
+        json.accumulate("client", this.id);
+        json.accumulate("connection_status", this.online);
+        return json.toString();
     }
 
 }
