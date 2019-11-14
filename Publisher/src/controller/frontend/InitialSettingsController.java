@@ -61,9 +61,9 @@ public class InitialSettingsController implements Initializable {
 
     @FXML
     private void nextScene(MouseEvent event) {
-        DevicesTypes type = this.cbTypeDevice.getValue();
-        DevicesBrand brand = this.cbBrandDevice.getValue();
-        DevicesModels model = this.cbModelDevice.getValue();
+        String type = this.cbTypeDevice.getValue().toString();
+        String brand = this.cbBrandDevice.getValue().toString();
+        String model = this.cbModelDevice.getValue().toString();
         String ip = this.txtIP.getText();
         
         int port = Integer.parseInt(this.txtPort.getText());

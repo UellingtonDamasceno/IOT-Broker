@@ -1,6 +1,5 @@
 package facade;
 
-import controller.frontend.DeviceDashboardController;
 import controller.frontend.ScreensController;
 import controller.frontend.StageController;
 import javafx.scene.Parent;
@@ -16,11 +15,9 @@ public class FacadeFrontend {
     
     private ScreensController sc;
     private StageController stageController;
-    private DeviceDashboardController dashboardController;
     
     private FacadeFrontend(){
         this.sc = new ScreensController();
-        this.dashboardController = (DeviceDashboardController) this.sc.getSceneController(Scenes.DEVICE_DASHBOARD);  
     }
     
     public static synchronized FacadeFrontend getInstance(){

@@ -11,7 +11,7 @@ import org.json.JSONObject;
  *
  * @author Uellington Damasceno
  */
-public abstract class Device extends Smart {
+public class Device extends Smart {
     
     private final String brand;
     private final String type;

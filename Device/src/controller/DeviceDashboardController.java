@@ -1,4 +1,4 @@
-package controller.frontend;
+package controller;
 
 import facade.FacadeBackend;
 import java.io.IOException;
