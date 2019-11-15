@@ -5,14 +5,20 @@
  */
 package controller.frontend;
 
+import facade.FacadeBackend;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import model.exceptions.DeviceOfflineException;
+import model.exceptions.DeviceStandByException;
 
 /**
  * FXML Controller class
@@ -38,16 +44,16 @@ public class PublisherDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
+    }
 
     @FXML
     private void randomize(ActionEvent event) {
-        
+
     }
 
     @FXML
     private void onOff(ActionEvent event) {
-        
+
     }
 
     @FXML
@@ -58,6 +64,15 @@ public class PublisherDashboardController implements Initializable {
 
     @FXML
     private void update(ActionEvent event) {
+        try {
+            FacadeBackend.getInstance().getSmartDevice().send(this.txtNewValue.getText());
+        } catch (IOException ex) {
+            Logger.getLogger(PublisherDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DeviceOfflineException ex) {
+            Logger.getLogger(PublisherDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DeviceStandByException ex) {
+            Logger.getLogger(PublisherDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
 }

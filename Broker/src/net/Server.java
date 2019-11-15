@@ -1,5 +1,6 @@
-package controller;
+package net;
 
+import controller.RequestController;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,13 +10,12 @@ import model.Client;
  *
  * @author Uellington Damasceno
  */
-public class BrokerController implements Runnable {
+public class Server implements Runnable {
 
     private ServerSocket broker;    
-//  Pode-se implementar uma fila de espera. como se fosse um pré cadastro. 
     private boolean online;
     
-    public BrokerController() {
+    public Server() {
         this.online = false;
     }
 
@@ -40,8 +40,10 @@ public class BrokerController implements Runnable {
             try {
                 Socket socket = this.broker.accept();
                 Client client = new Client(socket);
-                System.out.println("Cliente conectado: " + client);
+                client.addObserver(Router.getInstance());
+                client.start();
             } catch (IOException ex) {
+                System.out.println("Deu merda: "+ex.getMessage());
             }
         }
     }

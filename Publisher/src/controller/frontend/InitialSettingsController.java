@@ -15,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import util.Settings;
 import util.Settings.Connection;
 import util.Settings.DevicesBrand;
 import util.Settings.DevicesModels;
@@ -71,7 +72,7 @@ public class InitialSettingsController implements Initializable {
             this.txtStatus.setText("Criando seu Smartdevice.");
             FacadeBackend.getInstance().connect(type, brand, model, ip, port);
             this.txtStatus.setText("Registrando seu dispositivo.");
-            FacadeFrontend.getInstance().changeScreean(Scenes.DEVICE_DASHBOARD);
+            FacadeFrontend.getInstance().changeDashboardContent(Scenes.PUBLISHER_DASHBOARD);
         } catch (IOException ex) {
             Logger.getLogger(InitialSettingsController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

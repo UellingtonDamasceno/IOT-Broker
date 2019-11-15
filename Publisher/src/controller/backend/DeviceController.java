@@ -51,6 +51,10 @@ public class DeviceController {
     public void processRequest(String request) {
         try {
             switch (request) {
+                case "200":{
+                    System.out.println("Cadastrado com sucesso!");
+                    break;
+                }
                 case "ON": {
                     this.trunOn();
                     break;

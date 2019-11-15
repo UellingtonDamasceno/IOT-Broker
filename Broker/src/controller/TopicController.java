@@ -44,9 +44,8 @@ public class TopicController implements Observer{
      *
      * @param topicID
      * @throws IOException
-     * @throws InexistentKeyException
      */
-    public synchronized void deleteTopic(String topicID) throws IOException, InexistentKeyException {
+    public synchronized void deleteTopic(String topicID) throws IOException {
         if (this.topics.containsKey(topicID)) {
             Topic topic = this.topics.remove(topicID);
             topic.close();
@@ -60,14 +59,22 @@ public class TopicController implements Observer{
         return topicsJSON.toString();
     }
 
+    /**
+     * A solicitação deverá seguir o seguinte padrão 
+     * {"topicID": Tipo:Marca:Modelo,
+     *  "Cliente": descrição do cliente}
+     * @param topicID
+     * @param subscriber
+     * @throws ClientExistException 
+     */    
     public synchronized void postSubscripe(String topicID, Client subscriber) throws ClientExistException {
         Topic topic = this.topics.get(topicID);
-        topic.patchSubscriper(subscriber.getID(), subscriber);
+        topic.patchSubscriper(subscriber.getIP(), subscriber);
     }
      
     public synchronized void postPublisher( String topicID, Client publisher) throws ClientExistException{
         Topic topic = this.topics.get(topicID);
-        topic.patchPublisher(publisher.getID(), publisher);
+        topic.patchPublisher(publisher.getIP(), publisher);
     }
     
     public synchronized void deleteSubscripe(String topicID, String subscriperID) throws IOException {

@@ -26,19 +26,20 @@ public class FacadeBackend implements Observer {
         return (facade == null) ? facade = new FacadeBackend() : facade;
     }
 
-    public Device connect(String type, String brand, String model, String ip, int port) throws IOException {
+    public Device connect(String type, String brand, String model, String ip, int port) throws IOException, NetworkNotConfiguredException {
         //criar método que solicita ao servidor o novo ID do despositivo;
 
         Device smart = new Publisher(type, brand, model);
         System.out.println(smart);
+        this.deviceController.setSmartDevice(smart);        
         this.deviceController.connect(smart, ip, port);
-        this.deviceController.setSmartDevice(smart);
+        this.deviceController.trunOn();
         smart.addObserver(this);
 
         System.out.println("Despositivo criado com sucesso.");
         return smart;
     }
-
+    
     public void disconnect() throws IOException {
         this.deviceController.turnOff();
     }

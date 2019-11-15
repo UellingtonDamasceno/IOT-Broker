@@ -29,7 +29,7 @@ public class Client extends Observable implements Runnable {
         this.online = false;
     }
     
-    public String getID(){
+    public String getIP(){
         return this.id;
     }
     
@@ -37,6 +37,10 @@ public class Client extends Observable implements Runnable {
         return online;
     }
 
+    /**
+     * Método utilizado para inicializar entrada e saida de um cliente
+     * @throws IOException Caso exista problemas em pegar o input ou output do cliente
+     */
     public void start() throws IOException {
         InputStreamReader is = new InputStreamReader(this.socket.getInputStream());
         this.reader = new BufferedReader(is);
@@ -45,8 +49,13 @@ public class Client extends Observable implements Runnable {
         this.writer = new BufferedWriter(ot);
 
         this.online = true;
+        new Thread(this).start();
     }
 
+    /**
+     * Responsável por finalizar a conexão do cliente.
+     * @throws IOException Caso algum fluxo de dados ou socket não é fechado. 
+     */
     public void close() throws IOException {
         //this.writer(avisar que a conexão será finalizada);
         this.writer.close();
@@ -57,14 +66,14 @@ public class Client extends Observable implements Runnable {
     }
 
     private String read() throws IOException {
-
         StringBuilder request = new StringBuilder("");
         int buffer = -1;
         while (buffer != '\n') {
             buffer = reader.read();
             request.append((char) buffer);
-            System.out.println(request);
         }
+        JSONObject requestJSON = new JSONObject(request);
+        System.out.println(requestJSON.toString());
         return request.toString();
     }
 
@@ -77,12 +86,15 @@ public class Client extends Observable implements Runnable {
                     this.writer.write(response);
                     this.writer.flush();
                     sended = true;
+                    uploadAttempets = 0;
                 } catch (IOException ex) {
-                    System.out.println("Deu merda ao enviar a mensagem");
+                    System.out.println(ex.getMessage());
                     uploadAttempets --;
                 }
                 //Colocar um sleep;
+                System.out.println("Enviou :: "+ uploadAttempets);
             }
+            System.out.println("Mensagem enviada");
         };
         new Thread(send).start();
     }

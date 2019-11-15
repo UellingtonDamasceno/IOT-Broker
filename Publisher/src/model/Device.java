@@ -50,7 +50,8 @@ public abstract class Device extends Smart {
      */
     public void send(String response) throws IOException, DeviceOfflineException, DeviceStandByException {
         if (this.online && !this.standBy) {
-            this.write(response);
+            this.write(response+"\n");
+            System.out.println("Mensagem enviada:: "+ response);
         } else if(!this.online){
             throw new DeviceOfflineException();
         }else {
@@ -66,7 +67,8 @@ public abstract class Device extends Smart {
      */
     public void on() throws IOException, NetworkNotConfiguredException {
         if (this.isConnected()) {
-//            new Thread(this).start();
+            System.out.println("Despositivo ligado!");
+            new Thread(this).start();
             this.online = true;
             this.standBy = false;
         } else {
@@ -96,7 +98,7 @@ public abstract class Device extends Smart {
         //Verificar se o próximo socket será igual ao atual. 
         Socket socket = new Socket(ip, port);
         this.start(socket);
-        System.out.println("Está online");
+        System.out.println("Conexão configurada!");
         this.online = true;
     }
     

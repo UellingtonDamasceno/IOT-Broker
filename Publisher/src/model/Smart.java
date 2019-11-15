@@ -42,6 +42,7 @@ abstract public class Smart extends Observable implements Runnable {
             buffer = this.reader.read();
             message.append(((char) buffer));
         }
+        System.out.println(message);
         return message.toString();
     }
 

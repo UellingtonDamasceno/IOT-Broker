@@ -3,7 +3,7 @@ package view;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import facade.Facade;
+import net.Server;
 
 /**
  *
@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            Facade.getInstance().initialize(9999);
+            new Server().start(9999);
         } catch (IOException ex) {
             System.out.println("Não inicializado");
         }

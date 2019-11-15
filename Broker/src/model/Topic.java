@@ -15,6 +15,8 @@ import org.json.JSONObject;
 public class Topic {
 
     private final String id;
+    private int publisherSize;
+    private int subscripersSize;
     private Map<String, Client> publishers;
     private Map<String, Client> subscripers; //Lista de clientes conectados nesse server
 
@@ -27,21 +29,25 @@ public class Topic {
     public String getId() {
         return this.id;
     }
-
-    public void patchPublisher(String publisherID, Client publisher) throws ClientExistException {
-        this.patch(publisherID, this.publishers, publisher);
+    
+    public void patchPublisher(String publisherIP, Client publisher) throws ClientExistException {
+        this.publishers.put(publisherIP, publisher);
+        this.publisherSize++;
     }
 
-    public void patchSubscriper(String subscriperID, Client subscriper) throws ClientExistException {
-        this.patch(subscriperID, this.subscripers, subscriper);
+    public void patchSubscriper(String subscriperIP, Client subscriper) throws ClientExistException {
+        this.subscripers.put(subscriperIP, subscriper);
+        this.subscripersSize++;
     }
 
-    public void deletePublisher(String publisherID) throws IOException {
-        this.delete(publisherID, this.publishers);
+    public void deletePublisher(String publisherIP) throws IOException {
+        this.delete(publisherIP, this.publishers);
+        this.publisherSize--;
     }
 
-    public void deleteSubscriper(String subscriperID) throws IOException {
-        this.delete(subscriperID, this.subscripers);
+    public void deleteSubscriper(String subscriperIP) throws IOException {
+        this.delete(subscriperIP, this.subscripers);
+        this.subscripersSize--;
     }
 
     public void notifyAllPublisher(String response) {
@@ -52,17 +58,10 @@ public class Topic {
         this.notifyAll(this.subscripers.values().iterator(), response);
     }
 
-    private void delete(String id, Map<String, Client> customers) throws IOException {
-        Client client = customers.remove(id);
+    private void delete(String ip, Map<String, Client> customers) throws IOException {
+        Client client = customers.remove(ip);
         client.deleteObservers();
         client.close();
-    }
-
-    private void patch(String id, Map<String, Client> customers, Client client) throws ClientExistException {
-        if (customers.containsKey(id)) {
-            throw new ClientExistException();
-        }
-        customers.put(id, client);
     }
 
     public void close() throws IOException {
@@ -111,9 +110,9 @@ public class Topic {
         }
         return false;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         JSONObject topic = new JSONObject();
         topic.append("id", this.id);
         topic.put("publishers", this.publishers);

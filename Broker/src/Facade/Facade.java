@@ -1,8 +1,12 @@
 package facade;
 
-import controller.BrokerController;
+import controller.RequestController;
+import net.Server;
 import controller.TopicController;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+import model.Client;
 
 /**
  *
@@ -12,22 +16,18 @@ public class Facade{
 
     private static Facade facade;
 
-    private final BrokerController brokerController;
     private TopicController topicController;
+    private RequestController bufferController;
 
     private Facade() {
-        this.brokerController = new BrokerController();
         this.topicController = new TopicController();
+        this.bufferController = new RequestController();
     }
 
     public static synchronized Facade getInstance() {
         return (facade == null) ? facade = new Facade() : facade;
     }
-
-    public void initialize(int port) throws IOException {
-        this.brokerController.start(port);
-    }
-
+    
     //post/topic
     public String createTopic(String request) {
         //Método que recebe os parametros e cria um tópico
