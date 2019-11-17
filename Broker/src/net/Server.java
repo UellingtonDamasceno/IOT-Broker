@@ -24,6 +24,7 @@ public class Server implements Runnable {
             this.broker = new ServerSocket(port);
             this.online = true;
             new Thread(this).start();
+            System.out.println("Broker inicializado!");
         }
     }
 
@@ -31,6 +32,7 @@ public class Server implements Runnable {
         if (this.online) {
             this.broker.close();
             this.online = false;
+            System.out.println("Broker finalizado!");
         }
     }
 
@@ -42,6 +44,7 @@ public class Server implements Runnable {
                 Client client = new Client(socket);
                 client.addObserver(Router.getInstance());
                 client.start();
+                System.out.println("Nova conexão::" + client);
             } catch (IOException ex) {
                 System.out.println("Deu merda: "+ex.getMessage());
             }

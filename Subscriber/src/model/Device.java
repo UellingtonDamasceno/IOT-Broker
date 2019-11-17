@@ -13,9 +13,9 @@ import org.json.JSONObject;
  */
 public abstract class Device extends Smart {
     
-    private final String brand;
-    private final String type;
-    private final String model;
+    protected final String brand;
+    protected final String type;
+    protected final String model;
     private boolean online;
     private boolean standBy;
 
@@ -31,9 +31,6 @@ public abstract class Device extends Smart {
         return this.online;
     }
 
-    public String getBrand() {
-        return this.brand;
-    }
 
     public boolean inStadby() {
         return this.standBy;
@@ -100,8 +97,7 @@ public abstract class Device extends Smart {
         this.online = true;
     }
     
-    @Override
-    public String toString(){
+    public String status(){
         JSONObject device = new JSONObject();
         
         device.accumulate("brand", this.brand);

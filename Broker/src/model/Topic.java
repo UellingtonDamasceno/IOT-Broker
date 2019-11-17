@@ -115,6 +115,8 @@ public class Topic {
     public String toString() {
         JSONObject topic = new JSONObject();
         topic.append("id", this.id);
+        topic.accumulate("publisher_size", this.publisherSize);
+        topic.accumulate("subscriber_size", this.subscripersSize);
         topic.put("publishers", this.publishers);
         topic.put("subscribers", this.subscripers);
         return topic.toString();

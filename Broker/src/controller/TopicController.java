@@ -15,7 +15,7 @@ import org.json.JSONObject;
  *
  * @author Uellington Damasceno
  */
-public class TopicController implements Observer{
+public class TopicController {
 
     /**
      * permitir que o publisher fique offline (Avisando aos subscripers quando
@@ -33,10 +33,12 @@ public class TopicController implements Observer{
         this.topics = new HashMap();
     }
 
-    //
+    //Pode ser melhorado, utilizando retornos para indicar que já existe e tals. 
     public synchronized void postTopic(String topicID) {
-        Topic topic = new Topic(topicID);
-        this.topics.put(topicID, topic);
+        if (!this.topics.containsKey(topicID)) {
+            Topic topic = new Topic(topicID);
+            this.topics.put(topicID, topic);
+        }
     }
 
     /**
@@ -60,43 +62,47 @@ public class TopicController implements Observer{
     }
 
     /**
-     * A solicitação deverá seguir o seguinte padrão 
-     * {"topicID": Tipo:Marca:Modelo,
-     *  "Cliente": descrição do cliente}
+     * A solicitação deverá seguir o seguinte padrão {"topicID":
+     * Tipo:Marca:Modelo, "Cliente": descrição do cliente}
+     *
      * @param topicID
      * @param subscriber
-     * @throws ClientExistException 
-     */    
-    public synchronized void postSubscripe(String topicID, Client subscriber) throws ClientExistException {
+     * @throws ClientExistException
+     */
+    public synchronized void postSubscriber(String topicID, Client subscriber) throws ClientExistException {
         Topic topic = this.topics.get(topicID);
         topic.patchSubscriper(subscriber.getIP(), subscriber);
     }
-     
-    public synchronized void postPublisher( String topicID, Client publisher) throws ClientExistException{
+
+    public synchronized void postPublisher(String topicID, Client publisher) throws ClientExistException {
         Topic topic = this.topics.get(topicID);
         topic.patchPublisher(publisher.getIP(), publisher);
     }
-    
+
     public synchronized void deleteSubscripe(String topicID, String subscriperID) throws IOException {
         Topic topic = topics.get(topicID);
         topic.deleteSubscriper(subscriperID);
     }
-    
-    public synchronized void updatePublishers(String topicID, String response){
+
+    public synchronized void updatePublishers(String topicID, String response) {
         this.topics.get(topicID).notifyAllPublisher(response);
     }
-    
-    public synchronized void updateSubscriper(String topicID, String response) {
+
+    public synchronized void updateSubscriper(String topicID, int response) {
         /**
-         * Com atualização do publisher todos os publisher (Não bloqueados)
+         * Com atualização do publisher todos os publisher
          * poderão receber atualizações
          */
-        this.topics.get(topicID).notifyAllSubscripers(response);
+        if (this.topics.containsKey(topicID)) {
+            System.out.println("Topico existe e foi atualizado!");
+            this.topics.get(topicID).notifyAllSubscripers(String.valueOf(response));
+        }
     }
-    
+
     /**
-     * Fecha a porra toda! desconecta com o mundo! mas avisa ao pessoal. 
-     * @throws IOException 
+     * Fecha a porra toda! desconecta com o mundo! mas avisa ao pessoal.
+     *
+     * @throws IOException
      */
     public void disconect() throws IOException {
         //Funcionalidade especifica do broker
@@ -105,32 +111,5 @@ public class TopicController implements Observer{
         }
         this.topics.clear();
     }
-    
-        /**
-     * Outra opção seria fazer o controller de tópico
-     */
-    @Override
-    public void update(Observable observable, Object object) {
-        String request = (String) object;
-        String response;
 
-        switch (request) {
-            case "POST/TOPIC": {
-                
-                //response = this.createTopic(request);
-                break;
-            }case "POST/PUBLISHER":{
-                //response = this.createPublisher(request);
-            }case "POST/SUBSCRIBER":{
-                //response = this.createSubscriper(request);
-            }case "GET/TOPICS":{
-                
-            }case "DELETE/TOPIC":{
-            }
-            default: {
-                response = "404";
-            }
-        }
-        //((Client)observable).write(response);
-    }
 }

@@ -72,7 +72,7 @@ public class InitialSettingsController implements Initializable {
             this.txtStatus.setText("Criando seu Smartdevice.");
             FacadeBackend.getInstance().connect(type, brand, model, ip, port);
             this.txtStatus.setText("Registrando seu dispositivo.");
-            FacadeFrontend.getInstance().changeDashboardContent(Scenes.PUBLISHER_DASHBOARD);
+            FacadeFrontend.getInstance().changeScreean(Scenes.PUBLISHER_DASHBOARD);
         } catch (IOException ex) {
             Logger.getLogger(InitialSettingsController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {

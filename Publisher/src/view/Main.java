@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import util.Settings.Scenes;
 
 /**
  *
@@ -15,7 +16,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            FacadeFrontend.getInstance().initialize(primaryStage);
+            FacadeFrontend.getInstance().initialize(primaryStage, Scenes.INITIAL_SETTING);
         } catch (Exception ex) {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }

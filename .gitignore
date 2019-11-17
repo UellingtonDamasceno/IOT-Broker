@@ -4,3 +4,6 @@
 /Broker/dist/
 /Subscriber/build/
 /Subscriber/dist/
+/Broker/build/
+/Device/build/
+/Device/dist/

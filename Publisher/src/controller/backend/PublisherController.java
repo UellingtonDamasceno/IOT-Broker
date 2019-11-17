@@ -1,54 +1,67 @@
 package controller.backend;
 
 import java.io.IOException;
-import model.Device;
+import java.util.Observable;
+import java.util.Observer;
+import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
 
 /**
  *
  * @author Uellington Damasceno
  */
-public class DeviceController {
+public class PublisherController implements Observer{
 
     private String ip;
     private int port;
-
-    private Device smart;
-
-    public Device getSmartDevice() {
-        return this.smart;
+    private Publisher publisher;
+    
+    
+    public void updateValue(int value) throws IOException {
+        this.publisher.setValue(value);
+        this.publisher.updateTopic(value);
+    }
+    
+    public Publisher getPublisher(){
+        return this.publisher;
     }
 
-    public void setSmartDevice(Device smart) {
-        this.smart = smart;
+    
+    public void createPublisher(String type, String brand, String model) {
+        this.publisher = new Publisher(type, brand, model);
+        this.publisher.addObserver(this);
     }
 
-    public void connect(Device smartDevice, String ip, int port) throws IOException {
-        smartDevice.configureConnection(ip, port);
+    public void connect(String ip, int port) throws IOException {
+        this.publisher.configureConnection(ip, port);
         this.ip = ip;
         this.port = port;
     }
-
+    
     public void trunOn() throws IOException, NetworkNotConfiguredException {
-        this.smart.on();
+        this.publisher.on();
     }
 
     public void turnOff() throws IOException {
         //Avisar ao server que ele será desconectado!
-        this.smart.off();
+        this.publisher.off();
     }
 
     public void restart() throws IOException, NetworkNotConfiguredException {
-        this.turnOff();
-        this.connect(smart, ip, port);
-        this.trunOn();
+        this.publisher.off();
+        this.publisher.configureConnection(ip, port);
+        this.publisher.on();
     }
 
     public void standBy() {
-        this.smart.standBy();
+        this.publisher.standBy();
     }
 
-    public void processRequest(String request) {
+    public void createTopic() throws IOException{
+        this.publisher.createTopic();
+    }
+    
+    private void processRequest(String request) {
         try {
             switch (request) {
                 case "200":{
@@ -71,6 +84,9 @@ public class DeviceController {
                     this.standBy();
                     break;
                 }
+                case "404": {
+                    this.restart();
+                }
             }
         } catch (IOException e) {
             System.out.println("Erro ao conectar");
@@ -79,4 +95,11 @@ public class DeviceController {
         }
     }
 
+    
+    
+    @Override
+    public void update(Observable o, Object o1) {
+        this.processRequest((String) o1);
+    }
+    
 }

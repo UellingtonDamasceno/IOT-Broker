@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 import model.Client;
+import model.exceptions.ClientExistException;
 
 /**
  *
@@ -29,25 +30,24 @@ public class Facade{
     }
     
     //post/topic
-    public String createTopic(String request) {
+    public void createTopic(String request) {
         //Método que recebe os parametros e cria um tópico
         //this.topicController.postTopic(topicID, topic);
-        return null;
+        this.topicController.postTopic(request);
     }
 
-    //post/publisher
-    public String createPublisher(String request) {
-        return null;
+    public void postPublisher(String topicID, Client client) throws ClientExistException {
+        this.topicController.postPublisher(topicID, client);
     }
 
     //post/subscriper
-    public String createSubscriper(String request) {
-        return null;
+    public void postSubscriber(String request, Client client) throws ClientExistException {
+        this.topicController.postSubscriber(request, client);
     }
 
     //delete/topic
-    public String deleteTopic(String request) {
-        return null;
+    public void deleteTopic(String request) {
+       // this.topicController.deleteTopic(request);
     }
 
     //delete/publisher
@@ -63,6 +63,10 @@ public class Facade{
     //get/topic
     public String getTopics() {
         return this.topicController.getTopics();
+    }
+
+    public void updateTopic(String topicID, int value) {
+        this.topicController.updateSubscriper(topicID, value);;
     }
 
 }

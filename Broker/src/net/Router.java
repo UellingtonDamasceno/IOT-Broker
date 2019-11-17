@@ -1,10 +1,11 @@
 package net;
 
-import controller.RequestController;
 import facade.Facade;
 import java.util.Observable;
 import java.util.Observer;
 import model.Client;
+import model.exceptions.ClientExistException;
+import org.json.JSONObject;
 
 /**
  * Classe responsável por receber as solicitações e: - Adcionar novo cliente na
@@ -17,11 +18,10 @@ import model.Client;
  *
  * @author Uellington Damasceno
  */
-public class Router implements Observer{
+public class Router implements Observer {
 
-    private final int MAX_PROCESSES = 5;
     private int processing;
-    
+
     private static Router router;
 
     private Router() {
@@ -32,20 +32,33 @@ public class Router implements Observer{
         return (router == null) ? router = new Router() : router;
     }
 
-    
-    public synchronized String process(Client client, String request) {
-        
+    public synchronized String process(Client client, JSONObject request) {
+
         /*
             Validar de alguma forma se a solicitação deve ser processada. 
         Ideia: Usar o buffer para gerenciar a fila de requisições e usuarios;
             Como? 
          */
-        switch (request) {
+        switch (request.getString("route")) {
             case "POST/TOPIC": {
-               //Facade.getInstance().createTopic(request);
+                try {
+                    Facade.getInstance().createTopic(request.getString("topic_id"));
+                    Facade.getInstance().postPublisher(request.getString("topic_id"), client);
+                } catch (ClientExistException ex) {
+                    //Facade.getInstance().deleteTopic(request.getString("topic_id"));
+                    return "100";
+                }
                 return "200";
-            }case "POST/SUB":{
+            }
+            case "UPDATE/TOPIC": {
+                Facade.getInstance().updateTopic(request.getString("topic_id"), request.getInt("value"));
+                return "Atualizado!";
+            }
+            case "POST/SUB": {
                 return "Sub criado";
+            }
+            case "GET/TOPICS": {
+                return Facade.getInstance().getTopics();
             }
             default: {
                 return "404";
@@ -57,8 +70,12 @@ public class Router implements Observer{
     public void update(Observable o, Object o1) {
         Client client = (Client) o;
         String request = (String) o1;
-        String response = this.process(client, request);
+        JSONObject message = new JSONObject(request);
+        String response = this.process(client, message);
         client.write(response);
+
+        System.out.println("O cliente::" + client);
+        System.out.println("Solicitação::" + request);
     }
-    
+
 }

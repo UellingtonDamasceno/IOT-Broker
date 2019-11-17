@@ -13,9 +13,9 @@ import org.json.JSONObject;
  */
 public abstract class Device extends Smart {
     
-    private final String brand;
-    private final String type;
-    private final String model;
+    protected final String brand;
+    protected final String type;
+    protected final String model;
     private boolean online;
     private boolean standBy;
 
@@ -67,7 +67,6 @@ public abstract class Device extends Smart {
      */
     public void on() throws IOException, NetworkNotConfiguredException {
         if (this.isConnected()) {
-            System.out.println("Despositivo ligado!");
             new Thread(this).start();
             this.online = true;
             this.standBy = false;
@@ -82,7 +81,6 @@ public abstract class Device extends Smart {
         //while true;
         this.close();
 //        Tbm deve-se avisar ao server que o despospositivo está desligado.
-        System.out.println("Despositivo desligado");
         this.online = false;
     }
 

@@ -42,12 +42,11 @@ abstract public class Smart extends Observable implements Runnable {
             buffer = this.reader.read();
             message.append(((char) buffer));
         }
-        System.out.println(message);
         return message.toString();
     }
 
-    protected void write(String response) throws IOException {
-        this.writer.write(response);
+    protected void write(String request) throws IOException {
+        this.writer.write(request+'\n');
         this.writer.flush();
     }
 
@@ -70,7 +69,7 @@ abstract public class Smart extends Observable implements Runnable {
                 this.setChanged();
                 this.notifyObservers(message);
             } catch (IOException ex) {
-                System.out.println("Desconectado");
+                this.notifyObservers("404");
             }
         }
     }

@@ -24,9 +24,9 @@ public class FacadeFrontend {
         return (facade == null) ? facade = new FacadeFrontend() : facade;
     }
     
-    public void initialize(Stage stage) throws Exception{        
+    public void initialize(Stage stage, Scenes scene) throws Exception{        
         this.stageController = new StageController(stage);
-        Parent loadedScreen = this.sc.loadScreen(Scenes.INITIAL_SETTING);
+        Parent loadedScreen = this.sc.loadScreen(scene);
         this.stageController.changeStageContent(loadedScreen);
     }
     

@@ -1,9 +1,7 @@
 package facade;
 
-import controller.backend.DeviceController;
+import controller.backend.PublisherController;
 import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
 import model.Device;
 import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
@@ -12,54 +10,45 @@ import model.exceptions.NetworkNotConfiguredException;
  *
  * @author Uellington Damasceno
  */
-public class FacadeBackend implements Observer {
+public class FacadeBackend {
 
     private static FacadeBackend facade;
 
-    private DeviceController deviceController;
+    private PublisherController publisherController;
 
     private FacadeBackend() {
-        this.deviceController = new DeviceController();
+        this.publisherController = new PublisherController();
     }
 
     public static synchronized FacadeBackend getInstance() {
         return (facade == null) ? facade = new FacadeBackend() : facade;
     }
 
-    public Device connect(String type, String brand, String model, String ip, int port) throws IOException, NetworkNotConfiguredException {
-        //criar método que solicita ao servidor o novo ID do despositivo;
-
-        Device smart = new Publisher(type, brand, model);
-        System.out.println(smart);
-        this.deviceController.setSmartDevice(smart);        
-        this.deviceController.connect(smart, ip, port);
-        this.deviceController.trunOn();
-        smart.addObserver(this);
-
-        System.out.println("Despositivo criado com sucesso.");
-        return smart;
+    public void connect(String type, String brand, String model, String ip, int port) throws IOException, NetworkNotConfiguredException {
+        //criar método que solicita ao servidor o novo ID do despositivo;  
+        this.publisherController.createPublisher(type, brand, model);        
+        this.publisherController.connect(ip, port);
+        this.publisherController.trunOn();
     }
     
     public void disconnect() throws IOException {
-        this.deviceController.turnOff();
+        this.publisherController.turnOff();
     }
 
     public void standBy() {
-        this.deviceController.standBy();
+        this.publisherController.standBy();
     }
 
     public void restart() throws IOException, NetworkNotConfiguredException {
-        this.deviceController.restart();
+        this.publisherController.restart();
     }
 
-    public Device getSmartDevice() {
-        return this.deviceController.getSmartDevice();
+    public void updateValue(int value) throws IOException{
+        this.publisherController.updateValue(value);
     }
-
-    @Override
-    public void update(Observable o, Object o1) {
-        String request = (String) o1;
-        this.deviceController.processRequest(request);
+    
+    public Publisher getSmartDevice() {
+        return this.publisherController.getPublisher();
     }
 
 }

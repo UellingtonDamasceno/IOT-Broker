@@ -72,8 +72,6 @@ public class Client extends Observable implements Runnable {
             buffer = reader.read();
             request.append((char) buffer);
         }
-        JSONObject requestJSON = new JSONObject(request);
-        System.out.println(requestJSON.toString());
         return request.toString();
     }
 
@@ -88,13 +86,15 @@ public class Client extends Observable implements Runnable {
                     sended = true;
                     uploadAttempets = 0;
                 } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
+                    System.out.println("Erro ao enviar mensagem::" + response);
                     uploadAttempets --;
                 }
-                //Colocar um sleep;
-                System.out.println("Enviou :: "+ uploadAttempets);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    break;
+                }
             }
-            System.out.println("Mensagem enviada");
         };
         new Thread(send).start();
     }

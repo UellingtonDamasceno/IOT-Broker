@@ -75,7 +75,6 @@ public class Settings {
      * Juntar as telas de configuração de conexão e despositivos.
      */
     public enum Scenes {
-        DEVICE_DASHBOARD("DeviceDashboard.fxml", true),
         INITIAL_SETTING("InitialSettings.fxml", false),
         PUBLISHER_DASHBOARD("PublisherDashboard.fxml", false);
 
