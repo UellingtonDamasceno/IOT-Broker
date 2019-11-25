@@ -1,11 +1,11 @@
 package controller.frontend;
 
-import facade.FacadeBackend;
+import controller.backend.SubscriberController;
 import facade.FacadeFrontend;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -14,11 +14,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import model.Subscriber;
+import util.Settings;
 import util.Settings.Connection;
-import util.Settings.DevicesBrand;
-import util.Settings.DevicesModels;
-import util.Settings.DevicesTypes;
+import util.Settings.Brand;
+import util.Settings.Models;
 import util.Settings.Scenes;
+import util.Settings.Types;
 
 /**
  * FXML Controller class
@@ -38,11 +40,11 @@ public class InitialSettingsController implements Initializable {
     @FXML
     private Button btnExit;
     @FXML
-    private ComboBox<DevicesTypes> cbTypeDevice;
+    private ComboBox<Types> cbTypeDevice;
     @FXML
-    private ComboBox<DevicesBrand> cbBrandDevice;
+    private ComboBox<Brand> cbBrandDevice;
     @FXML
-    private ComboBox<DevicesModels> cbModelDevice;
+    private ComboBox<Models> cbModelDevice;
     @FXML
     private Text txtStatus;
     @FXML
@@ -53,51 +55,32 @@ public class InitialSettingsController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        this.cbTypeDevice.getItems().addAll(DevicesTypes.values());
-        this.cbModelDevice.getItems().addAll(DevicesModels.values());
-        this.cbBrandDevice.getItems().addAll(DevicesBrand.values());
+        this.cbTypeDevice.getItems().addAll(Types.values());
+        this.cbModelDevice.getItems().addAll(Models.values());
+        this.cbBrandDevice.getItems().addAll(Brand.values());
     }
 
     @FXML
     private void nextScene(MouseEvent event) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                btnConnect.setDisable(true);
-                btnExit.setDisable(true);
-            }
-        });
         String type = this.cbTypeDevice.getValue().toString();
         String brand = this.cbBrandDevice.getValue().toString();
         String model = this.cbModelDevice.getValue().toString();
         String ip = this.txtIP.getText();
+
         int port = Integer.parseInt(this.txtPort.getText());
 
-        Task<Void> task = new Task<Void>() {
-            protected Void call() throws Exception {
-                updateMessage("Criando seu despositivo.");
-                Thread.sleep(1500);
-                updateMessage("Despositivo criado!");
-                Thread.sleep(500);
-                updateMessage("Registrando seu dispositivo.");
-                Thread.sleep(2000);
-                FacadeBackend.getInstance().connect(type, brand, model, ip, port);
-                FacadeBackend.getInstance().createTopic();
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FacadeFrontend.getInstance().changeScreean(Scenes.PUBLISHER_DASHBOARD);
-                        } catch (Exception ex) {
-                        }
-                    }
-                });
-                return null;
-            }
-        };
-
-        this.txtStatus.textProperty().bind(task.messageProperty());
-        new Thread(task).start();
+        try {
+            FacadeFrontend.getInstance().setSubscriberDashBoardController(Scenes.SUBSCRIBER_DASHBOARD);
+            FacadeFrontend.getInstance().changeScreean(Scenes.SUBSCRIBER_DASHBOARD);
+            SubscriberController sc = new SubscriberController();
+            Subscriber s = new Subscriber(type, brand, model);
+            s.configureConnection(ip, port);
+            sc.setSubscriber(s);
+            s.on();
+            s.getTopics();
+        } catch (Exception ex) {
+            Logger.getLogger(InitialSettingsController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML

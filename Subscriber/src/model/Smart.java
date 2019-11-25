@@ -35,18 +35,18 @@ abstract public class Smart extends Observable implements Runnable {
     }
 
     private String read() throws IOException {
-        StringBuilder message = new StringBuilder("");
-        int buffer = -1;
-
+        StringBuilder message= new StringBuilder("");
+        int buffer = -1; 
         while (buffer != '\n') {
             buffer = this.reader.read();
             message.append(((char) buffer));
         }
+        System.out.println(message.toString());
         return message.toString();
     }
 
     protected void write(String response) throws IOException {
-        this.writer.write(response);
+        this.writer.write(response+'\n');
         this.writer.flush();
     }
 
@@ -65,9 +65,12 @@ abstract public class Smart extends Observable implements Runnable {
         String message;
         while (!this.socket.isClosed()) {
             try {
-                message = Smart.this.read();
-                this.setChanged();
-                this.notifyObservers(message);
+                message = this.read();
+                System.out.println(message);
+                if (message != null && !(message.isEmpty())) {
+                    this.setChanged();
+                    this.notifyObservers(message);
+                }
             } catch (IOException ex) {
                 System.out.println("Desconectado");
             }

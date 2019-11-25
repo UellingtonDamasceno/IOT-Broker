@@ -1,12 +1,15 @@
-package controller;
+package controller.frontend;
 
+import facade.FacadeFrontend;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import util.Settings.Scenes;
 
 /**
  * FXML Controller class
@@ -24,11 +27,7 @@ public class SubscriberDashboardController implements Initializable {
     @FXML
     private Button btnStatus;
     @FXML
-    private Button btnRemote;
-    @FXML
     private VBox vBoxCenterContent;
-    @FXML
-    private VBox vBoxSide;
 
     /**
      * Initializes the controller class.
@@ -36,7 +35,7 @@ public class SubscriberDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
+    }
 
     @FXML
     private void onOff(ActionEvent event) {
@@ -48,14 +47,18 @@ public class SubscriberDashboardController implements Initializable {
 
     @FXML
     private void changeScreenAllTopics(ActionEvent event) {
+        try {
+            FacadeFrontend.getInstance().changeDashboardContent(Scenes.ALL_TOPICS);
+        } catch (Exception ex) {
+        }
     }
 
     @FXML
     private void changeScreenStatus(ActionEvent event) {
     }
 
-    @FXML
-    private void changeScreenRemote(ActionEvent event) {
+    public void changeContent(Parent content) {
+        this.vBoxCenterContent.getChildren().clear();
+        this.vBoxCenterContent.getChildren().add(content);
     }
-    
 }

@@ -3,6 +3,8 @@ package controller.backend;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
 
@@ -10,96 +12,76 @@ import model.exceptions.NetworkNotConfiguredException;
  *
  * @author Uellington Damasceno
  */
-public class PublisherController implements Observer{
+public class PublisherController extends Observable implements Observer {
 
-    private String ip;
-    private int port;
     private Publisher publisher;
-    
-    
+
     public void updateValue(int value) throws IOException {
         this.publisher.setValue(value);
         this.publisher.updateTopic(value);
     }
-    
-    public Publisher getPublisher(){
+
+    public Publisher getPublisher() {
         return this.publisher;
     }
 
-    
-    public void createPublisher(String type, String brand, String model) {
-        this.publisher = new Publisher(type, brand, model);
+    public void createPublisher(String type, String brand, String model, String ip, int port) {
+        this.publisher = new Publisher(type, brand, model, ip, port);
         this.publisher.addObserver(this);
     }
 
-    public void connect(String ip, int port) throws IOException {
-        this.publisher.configureConnection(ip, port);
-        this.ip = ip;
-        this.port = port;
+    public boolean reconnect() throws IOException, InterruptedException {
+        this.publisher.close();
+        return this.publisher.reconnect();
     }
-    
-    public void trunOn() throws IOException, NetworkNotConfiguredException {
+
+    public void connect() throws IOException, NetworkNotConfiguredException {
+        this.publisher.connect();
         this.publisher.on();
     }
 
     public void turnOff() throws IOException {
         //Avisar ao server que ele será desconectado!
-        this.publisher.off();
+        this.publisher.disconnect();
+        this.publisher.setOnline(false);
+        this.publisher.close();
     }
 
-    public void restart() throws IOException, NetworkNotConfiguredException {
-        this.publisher.off();
-        this.publisher.configureConnection(ip, port);
-        this.publisher.on();
-    }
-
-    public void standBy() {
-        this.publisher.standBy();
-    }
-
-    public void createTopic() throws IOException{
+    public void createTopic() throws IOException {
         this.publisher.createTopic();
     }
-    
-    private void processRequest(String request) {
-        try {
-            switch (request) {
-                case "200":{
-                    System.out.println("Cadastrado com sucesso!");
-                    break;
-                }
-                case "ON": {
-                    this.trunOn();
-                    break;
-                }
-                case "OFF": {
-                    this.turnOff();
-                    break;
-                }
-                case "RESTART": {
-                    this.restart();
-                    break;
-                }
-                case "STANDBY": {
-                    this.standBy();
-                    break;
-                }
-                case "404": {
-                    this.restart();
-                }
+
+    private void processResponse(String request) {
+        switch (request) {
+            case "201": {
+                System.out.println("Criado com sucesso!");
+                break;
             }
-        } catch (IOException e) {
-            System.out.println("Erro ao conectar");
-        } catch (NetworkNotConfiguredException ex) {
-            System.out.println("Conexão não configurada");
+            case "202": {
+                System.out.println("Aceito com sucesso!");
+                break;
+            }
+            case "SERVER:CLOSE": {
+                this.setChanged();
+                this.notifyObservers("RECONNECT");
+                break;
+            }
+            case "RECONNECTED": {
+                this.setChanged();
+                this.notifyObservers(request);
+                break;
+            }
+            default: {
+                System.out.println("Erro! " + request);
+                break;
+            }
         }
     }
 
-    
-    
     @Override
     public void update(Observable o, Object o1) {
-        this.processRequest((String) o1);
+        System.out.println((String)o1);
+        this.processResponse((String) o1);
     }
-    
+
 }

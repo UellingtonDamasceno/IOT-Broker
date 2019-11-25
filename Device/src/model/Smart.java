@@ -46,7 +46,7 @@ abstract public class Smart extends Observable implements Runnable {
     }
 
     protected void write(String response) throws IOException {
-        this.writer.write(response);
+        this.writer.write(response+'\n');
         this.writer.flush();
     }
 

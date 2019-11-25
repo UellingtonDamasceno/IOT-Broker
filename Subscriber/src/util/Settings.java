@@ -6,14 +6,14 @@ package util;
  */
 public class Settings {
     
-    public enum DevicesTypes{
-        TV("TELEVISION"),
-        TELEFONE("PHONE"),
-        GELADEIRA("REFRIGERATOR");
+    public enum Types{
+        API("API"),
+        SERVER("SERVER"),
+        PHONE("PHONE");
         
-        private String type;
+        private final String type;
         
-        private DevicesTypes(String value){
+        private Types(String value){
             this.type = value;
         }
         
@@ -23,7 +23,7 @@ public class Settings {
         
     }
     
-    public enum DevicesModels{
+    public enum Models{
         S10,
         S10_NOTE,
         NOTE8,
@@ -32,13 +32,12 @@ public class Settings {
         IPHONE_11_PRO;
     }
     
-    public enum DevicesBrand{
-        APPLE, 
-        XIAOMI, 
-        SAMSUNG,
-        LG, 
-        REDMI,
-        ONE_PLUS;
+    public enum Brand{
+        GOOGLE, 
+        IBM, 
+        AWS,
+        CLOUD, 
+        DELL;
     }
     
     public enum Connection{
@@ -57,37 +56,15 @@ public class Settings {
         }
     }
     
-   public enum HTTP {
-        GET("GET"),
-        POST("POST"),
-        DELETE("DELETE"),
-        UPDATE("UPDATE");
-
-        private String verb;
-
-        private HTTP(String verb) {
-            this.verb = verb;
-        }
-
-        public String toString() {
-            return this.verb;
-        }
-    }
-
-   public enum Route{
-        TOPIC,
-        PUBLISHER,
-        SUBSCRIPER,
-    }
     
     /**
      * Juntar as telas de configuração de conexão e despositivos.
      */
     public enum Scenes {
         INITIAL_SETTING("InitialSettings.fxml", false),
-        PUBLISHER_DASHBOARD("PublisherDashboard.fxml", false),
-        RECONNECT_SCREEN("ReconnectScreen.fxml", false);
-        
+        SUBSCRIBER_DASHBOARD("SubscriberDashboard.fxml", true),
+        ALL_TOPICS("Alltopics.fxml", true);
+
         private final String value;
         private final boolean cache;
 
@@ -102,6 +79,11 @@ public class Settings {
 
         public boolean isCache() {
             return this.cache;
+        }
+        
+        @Override
+        public String toString(){
+            return this.value;
         }
     }
 

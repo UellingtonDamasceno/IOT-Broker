@@ -5,16 +5,14 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="678.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SubscriberDashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.frontend.SubscriberDashboardController">
    <left>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnOnOff" mnemonicParsing="false" onAction="#onOff" prefHeight="50.0" prefWidth="100.0" text="Ligar" />
             <Button fx:id="btnSubs" mnemonicParsing="false" onAction="#changeScreenSubs" prefHeight="50.0" prefWidth="100.0" text="Inscritos" />
             <Button fx:id="btnAllTopics" mnemonicParsing="false" onAction="#changeScreenAllTopics" prefHeight="50.0" prefWidth="100.0" text="Tópicos" />
             <Button fx:id="btnStatus" mnemonicParsing="false" onAction="#changeScreenStatus" prefHeight="50.0" prefWidth="100.0" text="Status" />
-            <Button fx:id="btnRemote" mnemonicParsing="false" onAction="#changeScreenRemote" prefHeight="50.0" prefWidth="100.0" text="C. Remoto" />
+            <Button fx:id="btnOnOff" mnemonicParsing="false" onAction="#onOff" prefHeight="50.0" prefWidth="100.0" text="Sair" />
          </children>
          <padding>
             <Insets right="5.0" />
@@ -24,10 +22,7 @@
    <padding>
       <Insets left="5.0" />
    </padding>
-   <right>
-      <VBox fx:id="vBoxSide" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
-   </right>
    <center>
-      <VBox fx:id="vBoxCenterContent" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+      <VBox fx:id="vBoxCenterContent" prefHeight="400.0" prefWidth="0.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

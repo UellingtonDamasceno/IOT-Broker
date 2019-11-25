@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
-import model.exceptions.ClientExistException;
 import org.json.JSONObject;
 
 /**
@@ -14,28 +12,40 @@ import org.json.JSONObject;
  */
 public class Topic {
 
-    private final String id;
     private int publisherSize;
     private int subscripersSize;
     private Map<String, Client> publishers;
     private Map<String, Client> subscripers; //Lista de clientes conectados nesse server
 
     public Topic(String id) {
-        this.id = id;
         this.subscripers = new HashMap();
         this.publishers = new HashMap();
     }
-
-    public String getId() {
-        return this.id;
+    
+    public int getPublishers(){
+        return this.publisherSize;
     }
     
-    public void patchPublisher(String publisherIP, Client publisher) throws ClientExistException {
+    public int getSubscribers(){
+        return this.subscripersSize;
+    }
+        
+    public boolean containsPublisher(String clientID){
+        return this.publishers.containsKey(clientID);
+    }
+    
+    
+    /**
+     * Adciona um novo publisher no tópico
+     * @param publisherIP ip e porta do publisher.
+     * @param publisher publisher deverá ser adcionado.
+     */
+    public void patchPublisher(String publisherIP, Client publisher) {
         this.publishers.put(publisherIP, publisher);
         this.publisherSize++;
     }
 
-    public void patchSubscriper(String subscriperIP, Client subscriper) throws ClientExistException {
+    public void patchSubscriper(String subscriperIP, Client subscriper) {
         this.subscripers.put(subscriperIP, subscriper);
         this.subscripersSize++;
     }
@@ -95,30 +105,12 @@ public class Topic {
         customers.clear();
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 19 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Topic) {
-            Topic other = (Topic) obj;
-            return (this.hashCode() == other.hashCode());
-        }
-        return false;
-    }
 
     @Override
     public String toString() {
         JSONObject topic = new JSONObject();
-        topic.append("id", this.id);
         topic.accumulate("publisher_size", this.publisherSize);
         topic.accumulate("subscriber_size", this.subscripersSize);
-        topic.put("publishers", this.publishers);
-        topic.put("subscribers", this.subscripers);
         return topic.toString();
     }
 }

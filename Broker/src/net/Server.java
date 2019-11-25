@@ -1,6 +1,5 @@
 package net;
 
-import controller.RequestController;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,7 +11,7 @@ import model.Client;
  */
 public class Server implements Runnable {
 
-    private ServerSocket broker;    
+    private ServerSocket broker;  
     private boolean online;
     
     public Server() {
@@ -46,7 +45,7 @@ public class Server implements Runnable {
                 client.start();
                 System.out.println("Nova conexão::" + client);
             } catch (IOException ex) {
-                System.out.println("Deu merda: "+ex.getMessage());
+                System.out.println("Falha na conexão: "+ex.getMessage());
             }
         }
     }

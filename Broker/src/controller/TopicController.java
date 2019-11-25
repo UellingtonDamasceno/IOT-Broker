@@ -1,11 +1,9 @@
 package controller;
 
-import model.exceptions.InexistentKeyException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
 import model.Client;
 import model.Topic;
 import model.exceptions.ClientExistException;
@@ -56,6 +54,7 @@ public class TopicController {
 
     public synchronized String getTopics() {
         JSONObject topicsJSON = new JSONObject();
+        topicsJSON.accumulate("response", "GET/TOPICS");
         topicsJSON.accumulate("hasTopic", !this.topics.isEmpty());
         topicsJSON.put("topics", this.topics);
         return topicsJSON.toString();
@@ -74,7 +73,7 @@ public class TopicController {
         topic.patchSubscriper(subscriber.getIP(), subscriber);
     }
 
-    public synchronized void postPublisher(String topicID, Client publisher) throws ClientExistException {
+    public synchronized void postPublisher(String topicID, Client publisher) {
         Topic topic = this.topics.get(topicID);
         topic.patchPublisher(publisher.getIP(), publisher);
     }
@@ -88,14 +87,16 @@ public class TopicController {
         this.topics.get(topicID).notifyAllPublisher(response);
     }
 
-    public synchronized void updateSubscriper(String topicID, int response) {
+    public synchronized String updateSubscriper(String topicID, int response) {
         /**
-         * Com atualização do publisher todos os publisher
-         * poderão receber atualizações
+         * Com atualização do publisher todos os publisher poderão receber
+         * atualizações
          */
         if (this.topics.containsKey(topicID)) {
-            System.out.println("Topico existe e foi atualizado!");
             this.topics.get(topicID).notifyAllSubscripers(String.valueOf(response));
+            return "200";
+        }else{
+            return "404";
         }
     }
 
@@ -110,6 +111,17 @@ public class TopicController {
             current.close();
         }
         this.topics.clear();
+    }
+
+    public void deletePublisher(String publisherID) throws IOException {
+        Iterator<Topic> iTopics = this.topics.values().iterator();
+        Topic currentTopic;
+        while(iTopics.hasNext()){
+            currentTopic = (Topic) iTopics.next();
+            if(currentTopic.containsPublisher(publisherID)){
+                currentTopic.deletePublisher(publisherID);
+            }
+        }
     }
 
 }

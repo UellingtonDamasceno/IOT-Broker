@@ -31,6 +31,9 @@ public abstract class Device extends Smart {
         return this.online;
     }
 
+    public String getBrand() {
+        return this.brand;
+    }
 
     public boolean inStadby() {
         return this.standBy;
@@ -63,7 +66,7 @@ public abstract class Device extends Smart {
      */
     public void on() throws IOException, NetworkNotConfiguredException {
         if (this.isConnected()) {
-//            new Thread(this).start();
+            new Thread(this).start();
             this.online = true;
             this.standBy = false;
         } else {
@@ -77,7 +80,6 @@ public abstract class Device extends Smart {
         //while true;
         this.close();
 //        Tbm deve-se avisar ao server que o despospositivo está desligado.
-        System.out.println("Despositivo desligado");
         this.online = false;
     }
 
@@ -89,15 +91,13 @@ public abstract class Device extends Smart {
     }
 
     public void configureConnection(String ip, int port) throws IOException {
-        
-        //Verificar se o próximo socket será igual ao atual. 
         Socket socket = new Socket(ip, port);
         this.start(socket);
-        System.out.println("Está online");
         this.online = true;
     }
     
-    public String status(){
+    @Override
+    public String toString(){
         JSONObject device = new JSONObject();
         
         device.accumulate("brand", this.brand);

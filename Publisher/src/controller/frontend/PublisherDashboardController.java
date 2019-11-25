@@ -1,8 +1,11 @@
 package controller.frontend;
 
 import facade.FacadeBackend;
+import facade.FacadeFrontend;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,39 +14,32 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import util.Settings.Scenes;
 
 /**
  * FXML Controller class
  *
  * @author Uellington Damasceno
  */
-public class PublisherDashboardController implements Initializable {
+public class PublisherDashboardController implements Initializable, Observer {
 
     @FXML
     private Text txtName;
     @FXML
     private TextField txtNewValue;
     @FXML
-    private BorderPane borderPane;
-    @FXML
     private Label lblValue;
-
     @FXML
     private Button btnRandom;
     @FXML
-    private Button btnUpdate;
-    @FXML
     private HBox hboxInput;
-    @FXML
-    private Button btnConfig;
     @FXML
     private VBox vboxConfig;
     @FXML
@@ -51,10 +47,10 @@ public class PublisherDashboardController implements Initializable {
     @FXML
     private TextField txtComp;
 
-    private boolean isReading;
     private Task<Void> task;
     private int rate;
     private String complement;
+    private boolean isReading;
 
     /**
      * Initializes the controller class.
@@ -64,11 +60,32 @@ public class PublisherDashboardController implements Initializable {
         this.rate = 100;
         this.complement = "º";
         this.isReading = false;
-        
+
         this.vboxConfig.setVisible(false);
-        
+
         this.task = this.getTask();
         this.lblValue.textProperty().bind(task.messageProperty());
+        this.txtName.setText(FacadeBackend.getInstance().getSmartDevice().toString());
+        FacadeBackend.getInstance().setPublisherControllerObserver(this);
+    }
+
+    private Task getTask() {
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                while (isReading) {
+                    int value = FacadeBackend.getInstance().getSmartDevice().read();
+                    FacadeBackend.getInstance().getSmartDevice().updateTopic(value);
+                    updateMessage(value + complement);
+                    try {
+                        Thread.sleep(10 * rate);
+                    } catch (InterruptedException ex) {
+
+                    }
+                }
+                return null;
+            }
+        };
     }
 
     @FXML
@@ -115,25 +132,6 @@ public class PublisherDashboardController implements Initializable {
         }
     }
 
-    private Task getTask() {
-        return new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                while (isReading) {
-                    int value = FacadeBackend.getInstance().getSmartDevice().read();
-                    FacadeBackend.getInstance().getSmartDevice().updateTopic(value);
-                    updateMessage(value + complement);
-                    try {
-                        Thread.sleep(10 * rate);
-                    } catch (InterruptedException ex) {
-
-                    }
-                }
-                return null;
-            }
-        };
-    }
-
     @FXML
     private void showConfig(ActionEvent event) {
         if (!this.vboxConfig.isVisible()) {
@@ -153,4 +151,22 @@ public class PublisherDashboardController implements Initializable {
         vboxConfig.setVisible(false);
     }
 
+    @Override
+    public void update(Observable o, Object o1) {
+        if (o1 instanceof String) {
+            String request = (String) o1;
+            if (request.equals("RECONNECT")) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            FacadeFrontend.getInstance().changeScreean(Scenes.RECONNECT_SCREEN);
+                        } catch (Exception ex) {
+                            FacadeFrontend.getInstance().showAlert(AlertType.ERROR, "Erro", "Erro carregar nova tela");
+                        }
+                    }
+                });
+            }
+        }
+    }
 }

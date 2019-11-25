@@ -3,7 +3,7 @@ package controller.frontend;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -28,8 +28,8 @@ public class StageController {
         this.mainStage.show();
     }
 
-    public void newAlert(AlertType type, String title, String mensege) {
-        Alert a = new Alert(type);
+    public void newAlert(String title, String mensege) {
+        Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle(title);
         a.setContentText(mensege);
         a.show();

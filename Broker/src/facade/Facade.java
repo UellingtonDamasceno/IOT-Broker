@@ -1,11 +1,7 @@
 package facade;
 
-import controller.RequestController;
-import net.Server;
 import controller.TopicController;
 import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
 import model.Client;
 import model.exceptions.ClientExistException;
 
@@ -18,11 +14,9 @@ public class Facade{
     private static Facade facade;
 
     private TopicController topicController;
-    private RequestController bufferController;
 
     private Facade() {
         this.topicController = new TopicController();
-        this.bufferController = new RequestController();
     }
 
     public static synchronized Facade getInstance() {
@@ -31,8 +25,6 @@ public class Facade{
     
     //post/topic
     public void createTopic(String request) {
-        //Método que recebe os parametros e cria um tópico
-        //this.topicController.postTopic(topicID, topic);
         this.topicController.postTopic(request);
     }
 
@@ -41,8 +33,8 @@ public class Facade{
     }
 
     //post/subscriper
-    public void postSubscriber(String request, Client client) throws ClientExistException {
-        this.topicController.postSubscriber(request, client);
+    public void postSubscriber(String topicID, Client client) throws ClientExistException {
+        this.topicController.postSubscriber(topicID, client);
     }
 
     //delete/topic
@@ -51,8 +43,8 @@ public class Facade{
     }
 
     //delete/publisher
-    public String deletePublisher() {
-        return null;
+    public void deletePublisher(String publisherID) throws IOException {
+        this.topicController.deletePublisher(publisherID);
     }
 
     //delete/subscriper
@@ -65,8 +57,8 @@ public class Facade{
         return this.topicController.getTopics();
     }
 
-    public void updateTopic(String topicID, int value) {
-        this.topicController.updateSubscriper(topicID, value);;
+    public String updateTopic(String topicID, int value) {
+        return this.topicController.updateSubscriper(topicID, value);
     }
 
 }

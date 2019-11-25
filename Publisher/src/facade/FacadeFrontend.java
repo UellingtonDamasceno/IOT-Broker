@@ -3,6 +3,7 @@ package facade;
 import controller.frontend.ScreensController;
 import controller.frontend.StageController;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import util.Settings.Scenes;
 
@@ -34,8 +35,9 @@ public class FacadeFrontend {
         Parent loadedScreen = this.sc.loadScreen(scene);
         this.stageController.changeStageContent(loadedScreen);
     }
-    
-    public void changeDashboardContent(Scenes scene){
-        
+
+    public void showAlert(AlertType alertType, String title, String message) {
+        this.stageController.newAlert(alertType, title, message);
     }
+
 }

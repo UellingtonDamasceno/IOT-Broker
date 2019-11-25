@@ -15,7 +15,7 @@ import org.json.JSONObject;
  */
 public class Client extends Observable implements Runnable {
 
-    private final String id;
+    private final String ip;
     private final Socket socket;
 
     private BufferedReader reader;
@@ -25,21 +25,23 @@ public class Client extends Observable implements Runnable {
 
     public Client(Socket socket) {
         this.socket = socket;
-        this.id = ((String) socket.getRemoteSocketAddress().toString().replace("/", ""));
+        this.ip = ((String) socket.getRemoteSocketAddress().toString().replace("/", ""));
         this.online = false;
     }
-    
-    public String getIP(){
-        return this.id;
+
+    public String getIP() {
+        return this.ip;
     }
-    
+
     public boolean isOnline() {
         return online;
     }
 
     /**
      * Método utilizado para inicializar entrada e saida de um cliente
-     * @throws IOException Caso exista problemas em pegar o input ou output do cliente
+     *
+     * @throws IOException Caso exista problemas em pegar o input ou output do
+     * cliente
      */
     public void start() throws IOException {
         InputStreamReader is = new InputStreamReader(this.socket.getInputStream());
@@ -54,7 +56,8 @@ public class Client extends Observable implements Runnable {
 
     /**
      * Responsável por finalizar a conexão do cliente.
-     * @throws IOException Caso algum fluxo de dados ou socket não é fechado. 
+     *
+     * @throws IOException Caso algum fluxo de dados ou socket não é fechado.
      */
     public void close() throws IOException {
         //this.writer(avisar que a conexão será finalizada);
@@ -79,18 +82,18 @@ public class Client extends Observable implements Runnable {
         Runnable send = () -> {
             int uploadAttempets = 5;
             boolean sended = false;
-            while (uploadAttempets != 0 || !sended) {
+            while (this.online && (uploadAttempets != 0 || !sended)) {
                 try {
-                    this.writer.write(response);
+                    this.writer.write(response + '\n');
                     this.writer.flush();
                     sended = true;
                     uploadAttempets = 0;
                 } catch (IOException ex) {
                     System.out.println("Erro ao enviar mensagem::" + response);
-                    uploadAttempets --;
+                    uploadAttempets--;
                 }
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     break;
                 }
@@ -110,8 +113,14 @@ public class Client extends Observable implements Runnable {
                     this.notifyObservers(message);
                 }
             } catch (IOException ex) {
-                System.out.println("Falha ao conectar");
-                this.online = false;
+                if (this.online) {
+                    this.online = false;
+                    JSONObject json = new JSONObject();
+                    json.accumulate("request_type", "ERROR");
+                    json.accumulate("error_id", "000");
+                    this.setChanged();
+                    this.notifyObservers(json.toString());
+                }
             }
         }
     }
@@ -119,9 +128,18 @@ public class Client extends Observable implements Runnable {
     @Override
     public String toString() {
         JSONObject json = new JSONObject();
-        json.accumulate("client", this.id);
+        json.accumulate("client", this.ip);
         json.accumulate("connection_status", this.online);
         return json.toString();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Client) {
+            Client other = (Client) object;
+            return (this.ip == other.ip);
+        }
+        return false;
     }
 
 }
