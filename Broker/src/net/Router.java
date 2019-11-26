@@ -23,8 +23,7 @@ public class Router implements Observer {
 
     private static Router router;
 
-    private Router() {
-    }
+    private Router() {}
 
     public static synchronized Router getInstance() {
         return (router == null) ? router = new Router() : router;
@@ -97,7 +96,6 @@ public class Router implements Observer {
                 try {
                     Facade.getInstance().deletePublisher(client.getIP());
                 } catch (IOException ex) {
-                    System.out.println("Não desconectou");
                     return "120";
                 }
                 return "200";

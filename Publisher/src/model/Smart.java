@@ -71,24 +71,22 @@ abstract public class Smart extends Observable implements Runnable {
         boolean solving = false;
         while (this.online) {
             try {
-                System.out.println("Voltando a ler como se nada tivesse acontecido");
                 message = this.read();
                 this.setChanged();
-                System.out.println("Avisando a observer + Nova mensagem");
                 this.notifyObservers(message);
-                System.out.println("Funcionando perfeitamente!");
                 solving = false;
             } catch (IOException ex) {
-                if (!solving) {
-                    System.out.println("Server caiu!!!!");
-                    solving = true;
-                    this.setChanged();
-                    this.notifyObservers("SERVER:CLOSE");
-                    System.out.println("Server caiu!");
+                try {
+                    if (!solving) {
+                        solving = true;
+                        this.setChanged();
+                        this.notifyObservers("SERVER:CLOSE");
+                    }
+                    Thread.sleep(500);
+                } catch (InterruptedException ex1) {
                 }
             }
         }
-        System.out.println("Thread morreu");
     }
 
 }

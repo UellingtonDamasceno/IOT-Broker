@@ -11,15 +11,22 @@ import org.json.JSONObject;
  * @author Uellington Damasceno
  */
 public class Topic {
+    
+    private String topicName;
 
     private int publisherSize;
     private int subscripersSize;
+
     private Map<String, Client> publishers;
     private Map<String, Client> subscripers; //Lista de clientes conectados nesse server
 
-    public Topic(String id) {
+    public Topic(String topicName) {
+        this.topicName = topicName;
         this.subscripers = new HashMap();
         this.publishers = new HashMap();
+    }
+    public String getTopicName(){
+        return this.topicName;
     }
     
     public int getPublishers(){

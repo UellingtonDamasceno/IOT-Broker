@@ -7,6 +7,7 @@ import java.util.Map;
 import model.Client;
 import model.Topic;
 import model.exceptions.ClientExistException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -55,8 +56,8 @@ public class TopicController {
     public synchronized String getTopics() {
         JSONObject topicsJSON = new JSONObject();
         topicsJSON.accumulate("response", "GET/TOPICS");
-        topicsJSON.accumulate("hasTopic", !this.topics.isEmpty());
-        topicsJSON.put("topics", this.topics);
+        topicsJSON.accumulate("qtdTopics", this.topics.size());
+        topicsJSON.put("topics", this.topics.values());        
         return topicsJSON.toString();
     }
 

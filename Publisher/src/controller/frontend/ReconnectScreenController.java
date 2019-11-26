@@ -3,8 +3,6 @@ package controller.frontend;
 import facade.FacadeBackend;
 import facade.FacadeFrontend;
 import java.net.URL;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -15,7 +13,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import util.Settings;
 import util.Settings.Scenes;
 
 /**
@@ -23,7 +20,7 @@ import util.Settings.Scenes;
  *
  * @author Uellington Conceição
  */
-public class ReconnectScreenController implements Initializable, Observer {
+public class ReconnectScreenController implements Initializable{
 
     @FXML
     private Button btnExit;
@@ -41,11 +38,9 @@ public class ReconnectScreenController implements Initializable, Observer {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        FacadeBackend.getInstance().setPublisherControllerObserver(this);
         this.progressBar.setVisible(false);
         this.isReconnect = false;
         this.task = this.getTask();
-        this.lblStatus.textProperty().bind(this.task.messageProperty());
     }
 
     @FXML
@@ -88,7 +83,6 @@ public class ReconnectScreenController implements Initializable, Observer {
                     Thread.sleep(500);
                     response = FacadeBackend.getInstance().restart();
                 }
-                System.out.println("Saiu do laço");
                 if (response) {
                     Platform.runLater(new Runnable() {
                         @Override
@@ -107,23 +101,4 @@ public class ReconnectScreenController implements Initializable, Observer {
         };
     }
 
-    @Override
-    public void update(Observable o, Object o1) {
-        System.out.println("Recebeu uma mensagem");
-        if (o1 instanceof String) {
-            String request = (String) o1;
-            if (request.equals("RECONNECTED")) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FacadeFrontend.getInstance().changeScreean(Settings.Scenes.PUBLISHER_DASHBOARD);
-                        } catch (Exception ex) {
-                            FacadeFrontend.getInstance().showAlert(Alert.AlertType.ERROR, "Erro", "Erro carregar nova tela");
-                        }
-                    }
-                });
-            }
-        }
-    }
 }

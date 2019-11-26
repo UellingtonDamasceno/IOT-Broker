@@ -61,19 +61,17 @@ public class Publisher extends Device {
         this.write(request.toString());
     }
 
-    public boolean reconnect() throws InterruptedException, IOException {
+    public boolean reconnect() throws InterruptedException {
         JSONObject request = new JSONObject();
         request.accumulate("request_type", "HTTP");
         request.accumulate("route", "RECONNECT");
-        
-        this.configureConnection(this.ip, this.port);
+
         try {
+            this.configureConnection(this.ip, this.port);
             this.write(request.toString());
             this.online = true;
-            System.out.println("Sucesso ao enviar");
             return true;
         } catch (IOException ex) {
-            System.out.println("Falha ao enviar");
             return false;
         }
     }

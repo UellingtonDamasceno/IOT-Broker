@@ -1,5 +1,6 @@
 package controller.frontend;
 
+import facade.FacadeBackend;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -35,6 +36,8 @@ public class AlltopicsController implements Initializable {
     @FXML
     private TableView<Topic> tblView;
 
+    private boolean isUpdating;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.btnSubscribe.setVisible(false);
@@ -42,11 +45,12 @@ public class AlltopicsController implements Initializable {
         this.tbcName.setCellValueFactory(new PropertyValueFactory("name"));
         this.tbcPubs.setCellValueFactory(new PropertyValueFactory("pubs"));
         this.tbcSubs.setCellValueFactory(new PropertyValueFactory("subs"));
-        
+        this.tblView.setItems(FacadeBackend.getInstance().getAllTopics());
     }
 
     @FXML
     private void updateList(ActionEvent event) {
+        this.btnUpdate.setDisable(true);
     }
 
     @FXML

@@ -1,6 +1,7 @@
 package controller.frontend;
 
 import controller.backend.SubscriberController;
+import facade.FacadeBackend;
 import facade.FacadeFrontend;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -70,14 +71,11 @@ public class InitialSettingsController implements Initializable {
         int port = Integer.parseInt(this.txtPort.getText());
 
         try {
+            FacadeBackend.getInstance().connect(type, brand, model, ip, port);
+            FacadeBackend.getInstance().updateListTopics();
+            Thread.sleep(500);
             FacadeFrontend.getInstance().setSubscriberDashBoardController(Scenes.SUBSCRIBER_DASHBOARD);
             FacadeFrontend.getInstance().changeScreean(Scenes.SUBSCRIBER_DASHBOARD);
-            SubscriberController sc = new SubscriberController();
-            Subscriber s = new Subscriber(type, brand, model);
-            s.configureConnection(ip, port);
-            sc.setSubscriber(s);
-            s.on();
-            s.getTopics();
         } catch (Exception ex) {
             Logger.getLogger(InitialSettingsController.class.getName()).log(Level.SEVERE, null, ex);
         }

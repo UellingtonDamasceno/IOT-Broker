@@ -1,10 +1,8 @@
 package facade;
 
 import controller.backend.PublisherController;
-import controller.frontend.PublisherDashboardController;
 import java.io.IOException;
 import java.util.Observer;
-import model.Device;
 import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
 

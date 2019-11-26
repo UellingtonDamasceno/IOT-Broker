@@ -19,14 +19,20 @@ abstract public class Smart extends Observable implements Runnable {
 
     private BufferedReader reader;
     private BufferedWriter writer;
-    
-    protected boolean isConnected(){
+
+    protected boolean online;
+
+    protected boolean isConnected() {
         return (this.socket != null);
     }
-    
-    protected void start(Socket socket) throws IOException {
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    protected void configureConnection(Socket socket) throws IOException {
         this.socket = socket;
-  
+
         InputStreamReader isr = new InputStreamReader(this.socket.getInputStream());
         this.reader = new BufferedReader(isr);
 
@@ -35,23 +41,22 @@ abstract public class Smart extends Observable implements Runnable {
     }
 
     private String read() throws IOException {
-        StringBuilder message= new StringBuilder("");
-        int buffer = -1; 
+        StringBuilder message = new StringBuilder("");
+        int buffer = -1;
+
         while (buffer != '\n') {
             buffer = this.reader.read();
             message.append(((char) buffer));
         }
-        System.out.println(message.toString());
         return message.toString();
     }
 
-    protected void write(String response) throws IOException {
-        this.writer.write(response+'\n');
+    protected void write(String request) throws IOException {
+        this.writer.write(request + '\n');
         this.writer.flush();
     }
 
-    
-    protected void close() throws IOException {
+    public void close() throws IOException {
         /**
          * Avisou ao server que ele será desconectado?
          */
@@ -63,18 +68,24 @@ abstract public class Smart extends Observable implements Runnable {
     @Override
     public void run() {
         String message;
-        while (!this.socket.isClosed()) {
+        boolean solving = false;
+        while (this.online) {
             try {
                 message = this.read();
-                System.out.println(message);
-                if (message != null && !(message.isEmpty())) {
-                    this.setChanged();
-                    this.notifyObservers(message);
-                }
+                this.setChanged();
+                this.notifyObservers(message);
+                solving = false;
             } catch (IOException ex) {
-                System.out.println("Desconectado");
+                try {
+                    if (!solving) {
+                        solving = true;
+                        this.setChanged();
+                        this.notifyObservers("SERVER:CLOSE");
+                    }
+                    Thread.sleep(500);
+                } catch (InterruptedException ex1) {
+                }
             }
         }
     }
-
 }

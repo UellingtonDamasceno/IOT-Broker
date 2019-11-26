@@ -22,13 +22,14 @@ public class StageController {
     }
 
     public void changeStageContent(Parent content) {
-        this.mainStage.close();
+        //this.mainStage.close();
         this.mainStage.setScene(new Scene(content));
-        this.mainStage.centerOnScreen();
+        //this.mainStage.centerOnScreen();
         this.mainStage.show();
     }
 
     public void newAlert(AlertType type, String title, String mensege) {
+       
         Alert a = new Alert(type);
         a.setTitle(title);
         a.setContentText(mensege);

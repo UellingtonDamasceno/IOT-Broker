@@ -41,7 +41,7 @@
                   <Font size="15.0" />
                </font>
             </Text>
-            <TextField fx:id="txtNewValue" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <TextField fx:id="txtNewValue" alignment="CENTER_RIGHT" text="0" HBox.hgrow="ALWAYS">
                <cursor>
                   <Cursor fx:constant="TEXT" />
                </cursor>
@@ -91,7 +91,7 @@
       </VBox>
    </right>
    <center>
-      <Label fx:id="lblValue" text="223º" BorderPane.alignment="CENTER">
+      <Label fx:id="lblValue" text="0º" BorderPane.alignment="CENTER">
          <font>
             <Font size="80.0" />
          </font>

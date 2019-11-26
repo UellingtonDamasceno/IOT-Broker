@@ -21,7 +21,7 @@ public class Topic {
     }
 
     public Topic (JSONObject object){
-        this(object.getString("id"), object.getInt("publishers"), object.getInt("subscribers"));
+        this(object.getString("topicName"), object.getInt("publishers"), object.getInt("subscribers"));
     }
     
     public String getName() {
@@ -49,7 +49,7 @@ public class Topic {
     }
     
     public String toString(){
-        return "nome: "+ this.getName() + "pubs: "+this.getPubs() + "subs"+this.getSubs();
+        return "nome: "+ this.getName() + "\npubs: "+this.getPubs() + "\nsubs"+this.getSubs();
     }
     
 }

@@ -3,8 +3,6 @@ package controller.backend;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
 
@@ -41,7 +39,6 @@ public class PublisherController extends Observable implements Observer {
     }
 
     public void turnOff() throws IOException {
-        //Avisar ao server que ele será desconectado!
         this.publisher.disconnect();
         this.publisher.setOnline(false);
         this.publisher.close();
@@ -52,6 +49,7 @@ public class PublisherController extends Observable implements Observer {
     }
 
     private void processResponse(String request) {
+        System.out.println("Recebeu: "+ request);
         switch (request) {
             case "201": {
                 System.out.println("Criado com sucesso!");
@@ -72,7 +70,7 @@ public class PublisherController extends Observable implements Observer {
                 break;
             }
             default: {
-                System.out.println("Erro! " + request);
+                System.out.println("Erro code: " + request);
                 break;
             }
         }
@@ -80,7 +78,6 @@ public class PublisherController extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object o1) {
-        System.out.println((String)o1);
         this.processResponse((String) o1);
     }
 
