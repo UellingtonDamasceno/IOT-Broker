@@ -3,7 +3,6 @@ package controller.frontend;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -13,7 +12,7 @@ import javafx.stage.Stage;
 public class StageController {
 
     private final Stage mainStage;
-
+    
     public StageController(Stage mainStage) {
         this.mainStage = mainStage;
         this.mainStage.setResizable(false);
@@ -21,6 +20,10 @@ public class StageController {
 //        this.mainStage.getIcons().add(new Image("/resources/icons8-bus-64.png"));
     }
 
+    public Stage getNewStage(){
+        return new Stage();
+    }
+    
     public void changeStageContent(Parent content) {
         this.mainStage.close();
         this.mainStage.setScene(new Scene(content));

@@ -3,7 +3,7 @@ package facade;
 import controller.TopicController;
 import java.io.IOException;
 import model.Client;
-import model.exceptions.ClientExistException;
+import org.json.JSONObject;
 
 /**
  *
@@ -28,12 +28,12 @@ public class Facade{
         this.topicController.postTopic(request);
     }
 
-    public void postPublisher(String topicID, Client client) throws ClientExistException {
+    public void postPublisher(String topicID, Client client) {
         this.topicController.postPublisher(topicID, client);
     }
 
     //post/subscriper
-    public void postSubscriber(String topicID, Client client) throws ClientExistException {
+    public void postSubscriber(String topicID, Client client) {
         this.topicController.postSubscriber(topicID, client);
     }
 
@@ -48,8 +48,8 @@ public class Facade{
     }
 
     //delete/subscriper
-    public String deleteSubscriper() {
-        return null;
+    public void deleteSubscriper(String topicID, String subscriperID) throws IOException {
+        this.topicController.deleteSubscripe(topicID, subscriperID);
     }
 
     //get/topic
@@ -57,8 +57,8 @@ public class Facade{
         return this.topicController.getTopics();
     }
 
-    public String updateTopic(String topicID, int value) {
-        return this.topicController.updateSubscriper(topicID, value);
+    public String updateTopic(JSONObject request) {
+        return this.topicController.updateSubscriper(request);
     }
 
 }

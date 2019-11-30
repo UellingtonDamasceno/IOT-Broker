@@ -40,6 +40,21 @@ public class Settings {
         DELL;
     }
     
+    public enum State{
+        ON(true), 
+        OFF(false);
+        
+        private boolean state;
+        
+        private State(boolean state){
+            this.state = state;
+        }
+        
+        public boolean getState(){
+            return this.state;
+        }
+    }
+    
     public enum Connection{
         DEFAULT_PORT(9999),
         DEFAULT_IP(127001);
@@ -63,7 +78,8 @@ public class Settings {
     public enum Scenes {
         INITIAL_SETTING("InitialSettings.fxml", false),
         SUBSCRIBER_DASHBOARD("SubscriberDashboard.fxml", true),
-        ALL_TOPICS("Alltopics.fxml", true);
+        TOPIC_VIZUALIZE("TopicVizualize.fxml", false),
+        ALL_TOPICS("Alltopics.fxml", false);
 
         private final String value;
         private final boolean cache;

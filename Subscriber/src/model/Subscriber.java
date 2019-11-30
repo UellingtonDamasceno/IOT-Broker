@@ -20,19 +20,19 @@ public class Subscriber extends Device {
     private String ip;
     private int port;
 
-    private List<Topic> allTopics;
+    private ObservableList<Topic> allTopics;
     private List<String> subTopics;
 
     public Subscriber(String type, String brand, String model, String ip, int port) {
         super(type, brand, model);
-        this.allTopics = new LinkedList();
+        this.allTopics = FXCollections.observableArrayList();
         this.subTopics = new LinkedList();
         this.ip = ip;
         this.port = port;
     }
 
     public ObservableList getAllTopics() {
-        return FXCollections.observableArrayList(allTopics);
+        return allTopics;
     }
 
     public void connect() throws IOException {
@@ -79,16 +79,46 @@ public class Subscriber extends Device {
         this.send(request.toString());
     }
 
-    public void subscripe(String topic) throws IOException, DeviceOfflineException, DeviceStandByException {
+    public void subscribe(String topic) throws IOException, DeviceOfflineException, DeviceStandByException {
         JSONObject request = new JSONObject();
         request.accumulate("request_type", "HTTP");
         request.accumulate("route", "POST/SUB");
+        request.accumulate("sub_id", this.toString());
         request.accumulate("topic_id", topic);
         this.send(request.toString());
     }
 
+    public void unsubscribe(String topicID) throws IOException, DeviceStandByException, DeviceOfflineException{
+        JSONObject request = new JSONObject();
+        request.accumulate("request_type", "HTTP");
+        request.accumulate("route", "DELETE/SUB");
+        request.accumulate("topic_id", topicID);
+        this.send(request.toString());
+    }
+    
     @Override
     public String toString() {
-        return "SUB::" + this.type + "::" + this.brand + "::" + this.model;
+        return "SUB:" + this.type + ":" + this.brand + ":" + this.model;
+    }
+
+    public void addTopic() {
+        this.allTopics.add(new Topic("Nome exemplo", 10, 25));
+    }
+
+    public void updateTopic(JSONObject response) {
+        Topic topic = this.getTopic(response.getString("topic_id"));
+        topic.addValue(response.getInt("value"));
+        System.out.println("Topic atualizado");
+    }
+
+    public Topic getTopic(String topicID) throws NullPointerException{
+        Iterator<Topic> iterator = this.allTopics.iterator();
+        while(iterator.hasNext()){
+            Topic currentTopic = iterator.next();
+            if(currentTopic.getName().equals(topicID)){
+                return currentTopic;
+            }
+        }
+        throw new NullPointerException();
     }
 }

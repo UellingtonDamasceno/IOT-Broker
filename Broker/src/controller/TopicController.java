@@ -55,7 +55,7 @@ public class TopicController {
 
     public synchronized String getTopics() {
         JSONObject topicsJSON = new JSONObject();
-        topicsJSON.accumulate("response", "GET/TOPICS");
+        topicsJSON.accumulate("route", "GET/TOPICS");
         topicsJSON.accumulate("qtdTopics", this.topics.size());
         topicsJSON.put("topics", this.topics.values());        
         return topicsJSON.toString();
@@ -69,7 +69,7 @@ public class TopicController {
      * @param subscriber
      * @throws ClientExistException
      */
-    public synchronized void postSubscriber(String topicID, Client subscriber) throws ClientExistException {
+    public synchronized void postSubscriber(String topicID, Client subscriber) {
         Topic topic = this.topics.get(topicID);
         topic.patchSubscriper(subscriber.getIP(), subscriber);
     }
@@ -88,13 +88,10 @@ public class TopicController {
         this.topics.get(topicID).notifyAllPublisher(response);
     }
 
-    public synchronized String updateSubscriper(String topicID, int response) {
-        /**
-         * Com atualização do publisher todos os publisher poderão receber
-         * atualizações
-         */
-        if (this.topics.containsKey(topicID)) {
-            this.topics.get(topicID).notifyAllSubscripers(String.valueOf(response));
+    public synchronized String updateSubscriper(JSONObject response) {
+        String topicID = response.getString("topic_id");
+        if (this.topics.containsKey(response.getString("topic_id"))) {
+            this.topics.get(topicID).notifyAllSubscripers(response);
             return "200";
         }else{
             return "404";

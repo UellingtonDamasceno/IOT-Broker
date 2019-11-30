@@ -2,7 +2,9 @@ package facade;
 
 import controller.backend.SubscriberController;
 import java.io.IOException;
+import java.util.Observer;
 import javafx.collections.ObservableList;
+import model.Topic;
 import model.exceptions.DeviceOfflineException;
 import model.exceptions.DeviceStandByException;
 import model.exceptions.NetworkNotConfiguredException;
@@ -28,6 +30,10 @@ public class FacadeBackend {
         this.sub.createSubscriber(type, brand, model, ip, port);
         this.sub.connect();
     }
+
+    public void addSubscriberControllerObserver(Observer observer){
+        this.sub.addObserver(observer);
+    }
     
     public ObservableList getAllTopics() {
         return this.sub.getAllTopics();
@@ -35,5 +41,25 @@ public class FacadeBackend {
 
     public void updateListTopics() throws IOException, DeviceStandByException, DeviceOfflineException {
         this.sub.getListTopic();
+    }
+
+    public void subscribe(String topicID) throws IOException, DeviceStandByException, DeviceOfflineException {
+        this.sub.subscribe(topicID);
+    }
+
+    public void unsubscribe(String topicID) throws DeviceStandByException, IOException, DeviceOfflineException {
+        this.sub.unsubscribe(topicID);
+    }
+
+    public void addTopic() {
+        this.sub.addTopic();
+    }
+
+    public void disconnect() throws IOException {
+        this.sub.disconnect();
+    }
+
+    public void setCurrentTopic(Topic selectedTopic) {
+        this.sub.setCurrentTopic(selectedTopic);
     }
 }

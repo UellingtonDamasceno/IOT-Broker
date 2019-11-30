@@ -2,6 +2,8 @@ package model;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.json.JSONObject;
 
 /**
@@ -13,11 +15,13 @@ public class Topic {
     private SimpleStringProperty name;
     private SimpleIntegerProperty pubs;
     private SimpleIntegerProperty subs;
+    private ObservableList<Integer> values;
     
     public Topic(String name, int pubs, int subs){
         this.name = new SimpleStringProperty(name);
         this.pubs = new SimpleIntegerProperty(pubs);
         this.subs = new SimpleIntegerProperty(subs);
+        this.values = FXCollections.observableArrayList();
     }
 
     public Topic (JSONObject object){
@@ -48,8 +52,14 @@ public class Topic {
         this.subs.set(subs);
     }
     
+    public void addValue(int value){
+        this.values.add(value);
+        System.out.println(this.values);
+    }
+    
+    @Override
     public String toString(){
-        return "nome: "+ this.getName() + "\npubs: "+this.getPubs() + "\nsubs"+this.getSubs();
+        return "\nnome: "+ this.getName() + "\npubs: "+this.getPubs() + "\nsubs: "+this.getSubs();
     }
     
 }

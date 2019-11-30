@@ -71,8 +71,8 @@ public class Topic {
         this.notifyAll(this.publishers.values().iterator(), response);
     }
 
-    public void notifyAllSubscripers(String response) {
-        this.notifyAll(this.subscripers.values().iterator(), response);
+    public void notifyAllSubscripers(JSONObject response) {
+        this.notifyAll(this.subscripers.values().iterator(), response.toString());
     }
 
     private void delete(String ip, Map<String, Client> customers) throws IOException {

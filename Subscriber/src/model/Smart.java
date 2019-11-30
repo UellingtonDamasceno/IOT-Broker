@@ -48,7 +48,7 @@ abstract public class Smart extends Observable implements Runnable {
             buffer = this.reader.read();
             message.append(((char) buffer));
         }
-        return message.toString();
+        return message.toString().trim();
     }
 
     protected void write(String request) throws IOException {

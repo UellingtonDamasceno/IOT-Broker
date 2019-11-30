@@ -4,8 +4,9 @@ import facade.Facade;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Client;
-import model.exceptions.ClientExistException;
 import org.json.JSONObject;
 
 /**
@@ -23,7 +24,8 @@ public class Router implements Observer {
 
     private static Router router;
 
-    private Router() {}
+    private Router() {
+    }
 
     public static synchronized Router getInstance() {
         return (router == null) ? router = new Router() : router;
@@ -60,32 +62,31 @@ public class Router implements Observer {
 
     private String httpRequest(Client client, JSONObject request) {
         String id;
-        int value;
 
         switch (request.getString("route")) {
             case "POST/TOPIC": {
-                try {
-                    id = request.getString("topic_id");
-                    Facade.getInstance().createTopic(id);
-                    Facade.getInstance().postPublisher(id, client);
-                } catch (ClientExistException ex) {
-                    return "100";
-                }
+
+                id = request.getString("topic_id");
+                Facade.getInstance().createTopic(id);
+                Facade.getInstance().postPublisher(id, client);
+
                 return "201"; //Created
             }
             case "UPDATE/TOPIC": {
-
-                id = request.getString("topic_id");
-                value = request.getInt("value");
-
-                return Facade.getInstance().updateTopic(id, value);
+                return Facade.getInstance().updateTopic(request);
             }
             case "POST/SUB": {
+                id = request.getString("topic_id");
+                Facade.getInstance().postSubscriber(id, client);
+                return "200";
+            }
+            case "DELETE/SUB": {
+                String subID = request.getString("sub_id");
+                id = request.getString("topic_id");
                 try {
-                    id = request.getString("topic_id");
-                    Facade.getInstance().postSubscriber(id, client);
-                } catch (ClientExistException ex) {
-                    return "Sub criado";
+                    Facade.getInstance().deleteSubscriper(id, subID);
+                } catch (IOException ex) {
+                    Logger.getLogger(Router.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 return "200";
             }
