@@ -7,8 +7,6 @@ import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -70,13 +68,19 @@ public class PublisherDashboardController implements Initializable, Observer {
     }
 
     private Task getTask() {
+
         return new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 while (isReading) {
                     int value = FacadeBackend.getInstance().getSmartDevice().read();
-                    FacadeBackend.getInstance().getSmartDevice().updateTopic(value);
-                    updateMessage(value + complement);
+                    try {
+                        FacadeBackend.getInstance().getSmartDevice().updateTopic(value);
+                        updateMessage(value + complement);
+                    } catch (IOException ex) {
+                        isReading = false;
+                        changeReconnectScreen();
+                    }
                     try {
                         Thread.sleep(10 * rate);
                     } catch (InterruptedException ex) {
@@ -127,8 +131,7 @@ public class PublisherDashboardController implements Initializable, Observer {
             this.lblValue.textProperty().unbind();
             this.lblValue.setText(value + this.complement);
         } catch (IOException ex) {
-            Logger.getLogger(PublisherDashboardController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            changeReconnectScreen();
         }
     }
 
@@ -154,21 +157,27 @@ public class PublisherDashboardController implements Initializable, Observer {
     @Override
     public void update(Observable o, Object o1) {
         System.out.println("Chegou aqui");
-        System.out.println((String)o1);
-        if (o1 instanceof String) {
-            String request = (String) o1;
-            if (request.equals("RECONNECT")) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            FacadeFrontend.getInstance().changeScreean(Scenes.RECONNECT_SCREEN);
-                        } catch (Exception ex) {
-                            FacadeFrontend.getInstance().showAlert(AlertType.ERROR, "Erro", "Erro carregar nova tela");
-                        }
-                    }
-                });
+        System.out.println((String) o1);
+        String request = (String) o1;
+        if (request.equals("RECONNECT")) {
+            changeReconnectScreen();
+        } else if (request.equals("OFF")) {
+            this.isReading = false;
+            this.lblValue.textProperty().unbind();
+            this.lblValue.setText("OFF");
+        } 
+    }
+
+    private void changeReconnectScreen() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    FacadeFrontend.getInstance().changeScreean(Scenes.RECONNECT_SCREEN);
+                } catch (Exception ex) {
+                    FacadeFrontend.getInstance().showAlert(AlertType.ERROR, "Erro", "Erro carregar nova tela");
+                }
             }
-        }
+        });
     }
 }

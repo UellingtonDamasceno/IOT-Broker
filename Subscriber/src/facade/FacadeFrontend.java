@@ -5,6 +5,7 @@ import controller.frontend.StageController;
 import controller.frontend.SubscriberDashboardController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import static javafx.scene.input.KeyCode.T;
 import javafx.stage.Stage;
 import util.Settings.Scenes;
 
@@ -51,8 +52,15 @@ public class FacadeFrontend {
         sdc.changeContent(content);
     }
 
-    public void showContentAuxStage(Scenes scenes, String name) throws Exception {
-        Parent content = this.screensController.loadScreen(scenes);
+    public Object showContentAuxStage(Scenes scenes, String name) throws Exception {
+        FXMLLoader loader = this.screensController.getLoaderFXML(scenes);
+        Parent content = loader.load();
+        Object controller = loader.getController();
         this.stageController.changeStageContent(name, content);
+        return controller;
+    }
+    
+    public void closeStage(String name){
+        this.stageController.closeStage(name);
     }
 }

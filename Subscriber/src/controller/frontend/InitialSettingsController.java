@@ -1,6 +1,5 @@
 package controller.frontend;
 
-import controller.backend.SubscriberController;
 import facade.FacadeBackend;
 import facade.FacadeFrontend;
 import java.net.URL;
@@ -15,8 +14,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
-import model.Subscriber;
-import util.Settings;
 import util.Settings.Connection;
 import util.Settings.Brand;
 import util.Settings.Models;

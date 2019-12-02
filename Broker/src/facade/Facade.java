@@ -61,4 +61,8 @@ public class Facade{
         return this.topicController.updateSubscribers(request);
     }
 
+    public void updatePublishers(String topicID, JSONObject request) {
+        this.topicController.updatePublishers(topicID, topicID);
+    }
+
 }

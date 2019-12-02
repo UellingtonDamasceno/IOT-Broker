@@ -119,4 +119,12 @@ public class Subscriber extends Device {
         return "SUB:" + this.type + ":" + this.brand + ":" + this.model;
     }
 
+    public void offPublisher(Topic topic) throws IOException {
+        JSONObject request = new JSONObject();
+        request.accumulate("request_type", "HTTP");
+        request.accumulate("route", "PUBS/OFF");
+        request.accumulate("topic_id", topic.getName());
+        this.write(request.toString());
+    }
+
 }

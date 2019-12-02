@@ -39,4 +39,11 @@ public class StageController {
         stage.show();
     }
 
+    public void closeStage(String name) {
+        Stage stage = this.stages.get(name);
+        if(stage != null){
+            stage.close();
+        }
+    }
+
 }

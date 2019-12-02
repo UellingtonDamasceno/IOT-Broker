@@ -6,6 +6,8 @@
 package controller.frontend;
 
 import facade.FacadeBackend;
+import facade.FacadeFrontend;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Observable;
@@ -26,6 +28,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import model.Topic;
 import org.json.JSONObject;
 
 /**
@@ -50,6 +53,7 @@ public class TopicVizualizeController implements Initializable, Observer {
     private int samples;
 
     private int i;
+    private Topic topic;
 
     /**
      * Initializes the controller class.
@@ -65,28 +69,13 @@ public class TopicVizualizeController implements Initializable, Observer {
 
         this.xAxis = new NumberAxis("Amostras", 0, this.samples, 1);
         this.yAxis = new NumberAxis("Medição", 0, 100, 5);
-
-        this.series = new LineChart.Series<Integer, Integer>("Tópico", valuesSeries);
-        this.lineChartData.add(series);
-
-        this.chart = new LineChart(xAxis, yAxis, lineChartData);
-
-        this.bordePane.setCenter(this.chart);
-    }
-
-    @FXML
-    private void previousScreen(ActionEvent event) {
-        try {
-//            FacadeFrontend.getInstance().closeStage("")
-        } catch (Exception ex) {
-            Logger.getLogger(TopicVizualizeController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     @FXML
     private void update(ActionEvent event) {
         String stringRate = this.txtRate.getText();
         this.samples = Integer.parseInt(stringRate);
+        this.xAxis.setUpperBound(samples);
     }
 
     private void chartUpdate(int value) {
@@ -101,7 +90,7 @@ public class TopicVizualizeController implements Initializable, Observer {
                     current = iterator.next();
                     current.setXValue(current.getXValue() - 1);
                 }
-                i = 21;
+                i = samples;
             }
         });
     }
@@ -111,7 +100,9 @@ public class TopicVizualizeController implements Initializable, Observer {
         JSONObject response = (JSONObject) o1;
         switch (response.getString("route")) {
             case "UPDATE/TOPIC": {
-                this.chartUpdate(response.getInt("value"));
+                if (this.topic.getName().equals(response.getString("topic_id"))) {
+                    this.chartUpdate(response.getInt("value"));
+                }
                 break;
             }
             case "PUB/DISCONNECT": {
@@ -129,5 +120,24 @@ public class TopicVizualizeController implements Initializable, Observer {
             }
         }
 
+    }
+
+    void setTopic(Topic topic) {
+        this.topic = topic;
+        this.series = new LineChart.Series<>(this.topic.getName(), valuesSeries);
+        this.lineChartData.add(series);
+
+        this.chart = new LineChart(xAxis, yAxis, lineChartData);
+
+        this.bordePane.setCenter(this.chart);
+    }
+
+    @FXML
+    private void offPublisher(ActionEvent event) {
+        try {
+            FacadeBackend.getInstance().offPublisher(this.topic);
+        } catch (IOException ex) {
+            Logger.getLogger(TopicVizualizeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="450.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.frontend.ReconnectScreenController">
+   <bottom>
+      <HBox alignment="CENTER" prefHeight="50.0" prefWidth="450.0" spacing="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnExit" mnemonicParsing="false" onAction="#exit" prefWidth="100.0" text="Sair" />
+            <Button fx:id="btnReconnect" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#reconnect" prefWidth="100.0" text="Reconectar" />
+         </children>
+      </HBox>
+   </bottom>
+   <center>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="lblStatus" text="Falha na rede">
+               <font>
+                  <Font size="50.0" />
+               </font>
+            </Label>            <ProgressIndicator fx:id="progressBar" prefHeight="50.0" prefWidth="450.0" />
+         </children>
+      </VBox>
+
+   </center>
+</BorderPane>

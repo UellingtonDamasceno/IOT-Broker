@@ -7,7 +7,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.lang.Runnable;
+import java.net.SocketException;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONObject;
 
 /**
  *
@@ -60,22 +64,35 @@ abstract public class Smart extends Observable implements Runnable {
         boolean solving = false;
         while (this.online) {
             try {
+                //this.socket.setSoTimeout(500);
                 message = this.reader.readLine();
                 this.setChanged();
                 this.notifyObservers(message);
                 solving = false;
+            } catch (SocketException e) {
+                if (!solving) {
+                    solving = true;
+
+                    System.out.println("Timeout");
+                    this.notify(solving);
+                }
             } catch (IOException ex) {
-                try {
-                    if (!solving) {
-                        solving = true;
-                        this.setChanged();
-                        this.notifyObservers("SERVER:CLOSE");
-                    }
-                    Thread.sleep(500);
-                } catch (InterruptedException ex1) {
+                if (!solving) {
+                    solving = true;
+
+                    System.out.println("IOException");
+                    this.notify(solving);
                 }
             }
         }
+    }
+
+    private void notify(boolean solving) {
+
+        JSONObject req = new JSONObject();
+        req.accumulate("route", "SERVER/CLOSE");
+        this.setChanged();
+        this.notifyObservers(req);
     }
 
 }

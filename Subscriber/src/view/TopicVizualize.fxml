@@ -14,7 +14,7 @@
    <bottom>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" onAction="#previousScreen" prefHeight="60.0" prefWidth="100.0" text="Voltar">
+            <Button mnemonicParsing="false" onAction="#offPublisher" prefHeight="60.0" prefWidth="100.0" text="Desligar">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>

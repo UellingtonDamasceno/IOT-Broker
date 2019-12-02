@@ -3,7 +3,6 @@ package facade;
 import controller.backend.SubscriberController;
 import java.io.IOException;
 import java.util.Observer;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import model.Topic;
 import model.exceptions.DeviceOfflineException;
@@ -56,8 +55,12 @@ public class FacadeBackend {
         this.sub.disconnect();
     }
 
-    public void addTopicsVisualize(Topic topic) {
-        this.sub.addTopicVisualize(topic);
+    public boolean restart() throws InterruptedException, IOException {
+        return this.sub.restart();
+    }
+
+    public void offPublisher(Topic topic) throws IOException {
+        this.sub.offPublisher(topic);
     }
    
 }

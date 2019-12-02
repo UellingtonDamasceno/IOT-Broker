@@ -96,10 +96,14 @@ public class Router implements Observer {
             case "PUB/DISCONNECT": {
                 try {
                     Facade.getInstance().deletePublisher(client.getIP());
-                    //Facade.getInstance().updateTopic(request);
+                    Facade.getInstance().updateTopic(request);
                 } catch (IOException ex) {
                     return "120";
                 }
+                return "200";
+            }case "PUBS/OFF":{
+                id = request.getString("topic_id");
+                Facade.getInstance().updatePublishers(id, request);
                 return "200";
             }
             case "RECONNECT": {

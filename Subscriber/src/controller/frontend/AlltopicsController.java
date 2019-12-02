@@ -44,7 +44,6 @@ public class AlltopicsController implements Initializable {
     @FXML
     private TableView<Topic> tblView;
 
-    private boolean isUpdating;
     @FXML
     private Button btnVisualize;
 
@@ -128,8 +127,9 @@ public class AlltopicsController implements Initializable {
     private void changeVisualizeScreen(ActionEvent event) {
         try {
             Topic selectedTopic = this.tblView.getSelectionModel().getSelectedItem();
-            FacadeFrontend.getInstance().showContentAuxStage(Scenes.TOPIC_VIZUALIZE, selectedTopic.getName());
-            FacadeBackend.getInstance().addTopicsVisualize(selectedTopic);
+            TopicVizualizeController controller;
+            controller = (TopicVizualizeController) FacadeFrontend.getInstance().showContentAuxStage(Scenes.TOPIC_VIZUALIZE, selectedTopic.getName());
+            controller.setTopic(selectedTopic);
         } catch (Exception ex) {
             Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
         }

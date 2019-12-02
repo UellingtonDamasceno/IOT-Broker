@@ -9,7 +9,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -88,11 +87,9 @@ public class ReconnectScreenController implements Initializable{
                         @Override
                         public void run() {
                             try {
-                                FacadeBackend.getInstance().createTopic();
-                                FacadeFrontend.getInstance().changeScreean(Scenes.PUBLISHER_DASHBOARD);
+                                FacadeFrontend.getInstance().changeScreean(Scenes.SUBSCRIBER_DASHBOARD);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
-                                FacadeFrontend.getInstance().showAlert(Alert.AlertType.ERROR, "Erro", "Erro carregar nova tela");
                             }
                         }
                     });

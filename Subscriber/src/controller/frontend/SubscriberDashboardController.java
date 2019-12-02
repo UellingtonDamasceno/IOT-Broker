@@ -61,6 +61,7 @@ public class SubscriberDashboardController implements Initializable {
         if(oneTime){
             try {
                 FacadeBackend.getInstance().updateListTopics();
+                this.oneTime = false;
             } catch (IOException ex) {
                 Logger.getLogger(SubscriberDashboardController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (DeviceStandByException ex) {

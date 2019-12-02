@@ -3,8 +3,11 @@ package controller.backend;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Publisher;
 import model.exceptions.NetworkNotConfiguredException;
+import org.json.JSONObject;
 
 /**
  *
@@ -48,15 +51,20 @@ public class PublisherController extends Observable implements Observer {
         this.publisher.createTopic();
     }
 
-    private void processResponse(String request) {
-        System.out.println("Recebeu: "+ request);
-        switch (request) {
-            case "201": {
-                System.out.println("Criado com sucesso!");
+    private void processResponse(JSONObject response) {
+        System.out.println("Recebeu: " + response);
+        String route = response.getString("route");
+        route = route.trim();
+        System.out.println("Rota desiginada:" + route);
+        switch (route) {
+            case "ON": {
+                this.setChanged();
+                this.notifyObservers(response);
                 break;
             }
-            case "202": {
-                System.out.println("Aceito com sucesso!");
+            case "PUBS/OFF": {
+                this.setChanged();
+                this.notifyObservers("OFF");
                 break;
             }
             case "SERVER:CLOSE": {
@@ -66,11 +74,11 @@ public class PublisherController extends Observable implements Observer {
             }
             case "RECONNECTED": {
                 this.setChanged();
-                this.notifyObservers(request);
+                this.notifyObservers(response);
                 break;
             }
             default: {
-                System.out.println("Erro code: " + request);
+                System.out.println("Erro code: " + response);
                 break;
             }
         }
@@ -78,8 +86,10 @@ public class PublisherController extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object o1) {
-        System.out.println((String)o1);
-        this.processResponse((String) o1);
+        if (o1 instanceof JSONObject) {
+            System.out.println(((JSONObject) o1).toString());
+            this.processResponse((JSONObject) o1);
+        }
     }
 
 }
