@@ -1,14 +1,17 @@
 package controller.backend;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import model.Subscriber;
 import model.Topic;
 import model.exceptions.DeviceOfflineException;
 import model.exceptions.DeviceStandByException;
 import model.exceptions.NetworkNotConfiguredException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -18,7 +21,11 @@ import org.json.JSONObject;
 public class SubscriberController extends Observable implements Observer {
 
     private Subscriber subscriber;
-    private Topic currentTopic;
+    private LinkedList<Topic> topicsViewed;
+
+    public SubscriberController() {
+        this.topicsViewed = new LinkedList();
+    }
 
     public void setSubscriber(Subscriber subscriber) {
         this.subscriber = subscriber;
@@ -30,8 +37,10 @@ public class SubscriberController extends Observable implements Observer {
         this.subscriber.addObserver(this);
     }
 
-    public void setCurrentTopic(Topic selectedTopic) {
-        this.currentTopic = selectedTopic;
+    public void addTopicVisualize(Topic selectedTopic) {
+        if (!this.topicsViewed.contains(selectedTopic)) {
+            this.topicsViewed.add(selectedTopic);
+        }
     }
 
     public void unsubscribe(String topicID) throws DeviceStandByException, IOException, DeviceOfflineException {
@@ -67,11 +76,14 @@ public class SubscriberController extends Observable implements Observer {
                 break;
             }
             case "UPDATE/TOPIC": {
-                System.out.println("Atualizando...");
-                //this.subscriber.updateTopic(response);
-                if (currentTopic.getName().equals(response.getString("topic_id"))) {
-                    System.out.println(currentTopic.getName());
-                    System.out.println(response.getString("topic_id"));
+                if(this.isViewed(response.getString("topic_id"))){
+                    this.setChanged();
+                    this.notifyObservers(response);
+                }
+                break;
+            }
+            case "PUB/DISCONNECT": {
+                if (this.isViewed(response.getString("topic_id"))) {
                     this.setChanged();
                     this.notifyObservers(response);
                 }
@@ -80,24 +92,20 @@ public class SubscriberController extends Observable implements Observer {
         }
     }
 
-    @Override
-    public void update(Observable o, Object o1) {
-        System.out.println("Processando");
-        try {
-            System.out.println("String: "+ (String)o1);
-            System.out.println(((String)o1).replace("\n", ":::"));
-            JSONObject request = new JSONObject((String) o1);
-            this.process(request);
-
-        } catch (Exception e) {
-            System.out.println("Deu merda");
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
-        }
+    private boolean isViewed(String topicName) {
+        return topicsViewed.stream().anyMatch((topic) -> (topic.getName().equals(topicName)));
     }
 
-    public void addTopic() {
-        this.subscriber.addTopic();
+    @Override
+    public void update(Observable o, Object o1) {
+        try {
+            JSONObject request = new JSONObject((String) o1);
+            this.process(request);
+        } catch (JSONException e) {
+            System.out.println("Deu merda!");
+            System.out.println((String)o1);
+            System.out.println(e.getMessage());
+        }
     }
 
     public void disconnect() throws IOException {

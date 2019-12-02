@@ -9,7 +9,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" prefHeight="580.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.frontend.InitialSettingsController">
+<AnchorPane id="AnchorPane" prefHeight="580.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.frontend.InitialSettingsController">
    <children>
       <Text layoutX="54.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Configurar despositivo">
          <font>
@@ -22,7 +22,7 @@
          </font>
       </Text>
       <ComboBox fx:id="cbTypeDevice" layoutX="92.0" layoutY="72.0" prefHeight="25.0" prefWidth="240.0" />
-      <Text layoutX="23.0" layoutY="157.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Marca:" wrappingWidth="48.279296875">
+      <Text layoutX="19.0" layoutY="158.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Marca:" wrappingWidth="70.27930170297623">
          <font>
             <Font size="16.0" />
          </font>
@@ -48,8 +48,8 @@
       <TextField fx:id="txtPort" layoutX="106.0" layoutY="394.0" prefHeight="25.0" prefWidth="220.0" />
       <CheckBox fx:id="cbPortDefault" layoutX="26.0" layoutY="501.0" mnemonicParsing="false" onMouseClicked="#setDefaultPort" text="Porta default" />
       <CheckBox fx:id="cbLocalhost" layoutX="26.0" layoutY="475.0" mnemonicParsing="false" onMouseClicked="#setLocalhost" text="Localhost" />
-      <Button fx:id="btnExit" layoutX="25.0" layoutY="541.0" mnemonicParsing="false" onMouseClicked="#exit" prefHeight="25.0" prefWidth="65.0" text="Sair" />
-      <Button fx:id="btnConnect" layoutX="260.0" layoutY="541.0" mnemonicParsing="false" onMouseClicked="#nextScene" prefHeight="25.0" prefWidth="65.0" text="Conectar" />
+      <Button fx:id="btnExit" layoutX="25.0" layoutY="541.0" mnemonicParsing="false" onMouseClicked="#exit" prefHeight="26.0" prefWidth="100.0" text="Sair" />
+      <Button fx:id="btnConnect" layoutX="225.0" layoutY="541.0" mnemonicParsing="false" onMouseClicked="#nextScene" prefHeight="26.0" prefWidth="100.0" text="Conectar" />
       <Text layoutX="62.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Configurar conexão">
          <font>
             <Font size="24.0" />

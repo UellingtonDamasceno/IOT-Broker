@@ -6,7 +6,6 @@
 package controller.frontend;
 
 import facade.FacadeBackend;
-import facade.FacadeFrontend;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Observable;
@@ -23,10 +22,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import org.json.JSONObject;
-import util.Settings.Scenes;
 
 /**
  * FXML Controller class
@@ -57,9 +57,9 @@ public class TopicVizualizeController implements Initializable, Observer {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         FacadeBackend.getInstance().addSubscriberControllerObserver(this);
-        
+
         this.samples = 21;
-       
+
         this.valuesSeries = FXCollections.observableArrayList();
         this.lineChartData = FXCollections.observableArrayList();
 
@@ -77,7 +77,7 @@ public class TopicVizualizeController implements Initializable, Observer {
     @FXML
     private void previousScreen(ActionEvent event) {
         try {
-            FacadeFrontend.getInstance().changeScreean(Scenes.SUBSCRIBER_DASHBOARD);
+//            FacadeFrontend.getInstance().closeStage("")
         } catch (Exception ex) {
             Logger.getLogger(TopicVizualizeController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -109,10 +109,23 @@ public class TopicVizualizeController implements Initializable, Observer {
     @Override
     public void update(Observable o, Object o1) {
         JSONObject response = (JSONObject) o1;
-        System.out.println("Entrou aqui");
         switch (response.getString("route")) {
             case "UPDATE/TOPIC": {
                 this.chartUpdate(response.getInt("value"));
+                break;
+            }
+            case "PUB/DISCONNECT": {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        Alert alert = new Alert(AlertType.INFORMATION);
+                        alert.setTitle("Publicador desconectado!");
+                        alert.setContentText("Um publicador se deconectou.");
+                        alert.setResizable(false);
+                        alert.show();
+                    }
+                });
+                break;
             }
         }
 

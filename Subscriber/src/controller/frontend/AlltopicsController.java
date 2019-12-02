@@ -52,25 +52,36 @@ public class AlltopicsController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.btnSubscribe.setVisible(false);
         this.btnUnsubscribe.setVisible(false);
+        this.btnVisualize.setVisible(false);
         this.tbcName.setCellValueFactory(new PropertyValueFactory("name"));
         this.tbcPubs.setCellValueFactory(new PropertyValueFactory("pubs"));
         this.tbcSubs.setCellValueFactory(new PropertyValueFactory("subs"));
+        this.tbcIsSubscriber.setCellValueFactory(new PropertyValueFactory("subscriber"));
         this.tblView.setItems(FacadeBackend.getInstance().getAllTopics());
     }
 
     @FXML
     private void updateList(ActionEvent event) {
-        FacadeBackend.getInstance().addTopic();
-        System.out.println("Add novo topico");
+        try {
+            FacadeBackend.getInstance().updateListTopics();
+        } catch (IOException ex) {
+            Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DeviceStandByException ex) {
+            Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DeviceOfflineException ex) {
+            Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     private void unsubscribe(ActionEvent event) {
         try {
-            String id = this.tblView.getSelectionModel().getSelectedItem().getName();
-            FacadeBackend.getInstance().unsubscribe(id);
-            this.btnSubscribe.setVisible(true);
-            this.btnUnsubscribe.setVisible(false);
+            Topic selected = this.tblView.getSelectionModel().getSelectedItem();
+            FacadeBackend.getInstance().unsubscribe(selected.getName());
+            this.btnSubscribe.setVisible(!selected.isSubscriber());
+            this.btnUnsubscribe.setVisible(selected.isSubscriber());
+            this.btnVisualize.setVisible(selected.isSubscriber());
+
         } catch (DeviceStandByException ex) {
             Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -82,9 +93,12 @@ public class AlltopicsController implements Initializable {
 
     @FXML
     private void subscribe(ActionEvent event) {
-        String id = this.tblView.getSelectionModel().getSelectedItem().getName();
+        Topic selected = this.tblView.getSelectionModel().getSelectedItem();
         try {
-            FacadeBackend.getInstance().subscribe(id);
+            FacadeBackend.getInstance().subscribe(selected.getName());
+            this.btnSubscribe.setVisible(!selected.isSubscriber());
+            this.btnUnsubscribe.setVisible(selected.isSubscriber());
+            this.btnVisualize.setVisible(selected.isSubscriber());
         } catch (IOException ex) {
             Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DeviceStandByException ex) {
@@ -100,8 +114,9 @@ public class AlltopicsController implements Initializable {
     private void itemSelected(MouseEvent event) {
         if (!tblView.getSelectionModel().isEmpty()) {
             Topic selectedTopic = this.tblView.getSelectionModel().getSelectedItem();
-            this.btnSubscribe.setVisible(true);
-            System.out.println(selectedTopic);
+            this.btnSubscribe.setVisible(!selectedTopic.isSubscriber());
+            this.btnUnsubscribe.setVisible(selectedTopic.isSubscriber());
+            this.btnVisualize.setVisible(selectedTopic.isSubscriber());
         } else {
             this.btnSubscribe.setVisible(false);
             this.btnUnsubscribe.setVisible(false);
@@ -113,8 +128,8 @@ public class AlltopicsController implements Initializable {
     private void changeVisualizeScreen(ActionEvent event) {
         try {
             Topic selectedTopic = this.tblView.getSelectionModel().getSelectedItem();
-            FacadeFrontend.getInstance().changeScreean(Scenes.TOPIC_VIZUALIZE);
-            FacadeBackend.getInstance().setCurrentTopic(selectedTopic);
+            FacadeFrontend.getInstance().showContentAuxStage(Scenes.TOPIC_VIZUALIZE, selectedTopic.getName());
+            FacadeBackend.getInstance().addTopicsVisualize(selectedTopic);
         } catch (Exception ex) {
             Logger.getLogger(AlltopicsController.class.getName()).log(Level.SEVERE, null, ex);
         }

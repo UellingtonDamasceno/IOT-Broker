@@ -153,6 +153,8 @@ public class PublisherDashboardController implements Initializable, Observer {
 
     @Override
     public void update(Observable o, Object o1) {
+        System.out.println("Chegou aqui");
+        System.out.println((String)o1);
         if (o1 instanceof String) {
             String request = (String) o1;
             if (request.equals("RECONNECT")) {

@@ -93,9 +93,10 @@ public class Router implements Observer {
             case "GET/TOPICS": {
                 return Facade.getInstance().getTopics();
             }
-            case "DISCONNECT": {
+            case "PUB/DISCONNECT": {
                 try {
                     Facade.getInstance().deletePublisher(client.getIP());
+                    //Facade.getInstance().updateTopic(request);
                 } catch (IOException ex) {
                     return "120";
                 }

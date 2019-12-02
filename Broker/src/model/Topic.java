@@ -11,7 +11,7 @@ import org.json.JSONObject;
  * @author Uellington Damasceno
  */
 public class Topic {
-    
+
     private String topicName;
 
     private int publisherSize;
@@ -25,25 +25,26 @@ public class Topic {
         this.subscripers = new HashMap();
         this.publishers = new HashMap();
     }
-    public String getTopicName(){
+
+    public String getTopicName() {
         return this.topicName;
     }
-    
-    public int getPublishers(){
+
+    public int getPublishers() {
         return this.publisherSize;
     }
-    
-    public int getSubscribers(){
+
+    public int getSubscribers() {
         return this.subscripersSize;
     }
-        
-    public boolean containsPublisher(String clientID){
+
+    public boolean containsPublisher(String clientID) {
         return this.publishers.containsKey(clientID);
     }
-    
-    
+
     /**
      * Adciona um novo publisher no tópico
+     *
      * @param publisherIP ip e porta do publisher.
      * @param publisher publisher deverá ser adcionado.
      */
@@ -76,9 +77,11 @@ public class Topic {
     }
 
     private void delete(String ip, Map<String, Client> customers) throws IOException {
-        Client client = customers.remove(ip);
-        client.deleteObservers();
-        client.close();
+        if (customers.containsKey(ip)) {
+            Client client = customers.remove(ip);
+            client.deleteObservers();
+            client.close();
+        }
     }
 
     public void close() throws IOException {
@@ -111,7 +114,6 @@ public class Topic {
         }
         customers.clear();
     }
-
 
     @Override
     public String toString() {

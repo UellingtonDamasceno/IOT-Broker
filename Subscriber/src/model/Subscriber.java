@@ -2,8 +2,6 @@ package model;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.exceptions.DeviceOfflineException;
@@ -21,12 +19,10 @@ public class Subscriber extends Device {
     private int port;
 
     private ObservableList<Topic> allTopics;
-    private List<String> subTopics;
 
     public Subscriber(String type, String brand, String model, String ip, int port) {
         super(type, brand, model);
         this.allTopics = FXCollections.observableArrayList();
-        this.subTopics = new LinkedList();
         this.ip = ip;
         this.port = port;
     }
@@ -60,14 +56,25 @@ public class Subscriber extends Device {
             return false;
         }
     }
-    
+
     public void updateTopics(JSONObject topics) {
+        int index;
+        Topic newTopic, topicAux;
+        JSONObject currentTopic;
         JSONArray jsonArray = topics.getJSONArray("topics");
         Iterator<Object> iterator = jsonArray.iterator();
-        JSONObject currentTopic;
+
         while (iterator.hasNext()) {
             currentTopic = (JSONObject) iterator.next();
-            allTopics.add(new Topic(currentTopic));
+            newTopic = new Topic(currentTopic);
+            index = allTopics.indexOf(newTopic);
+            if (index >= 0) {
+                topicAux = allTopics.get(index);
+                topicAux.setPubs(newTopic.getPubs());
+                topicAux.setSubs(newTopic.getSubs());
+            } else {
+                allTopics.add(newTopic);
+            }
         }
     }
 
@@ -79,21 +86,32 @@ public class Subscriber extends Device {
         this.send(request.toString());
     }
 
-    public void subscribe(String topic) throws IOException, DeviceOfflineException, DeviceStandByException {
+    public void subscribe(String topicID) throws IOException, DeviceOfflineException, DeviceStandByException {
         JSONObject request = new JSONObject();
         request.accumulate("request_type", "HTTP");
         request.accumulate("route", "POST/SUB");
         request.accumulate("sub_id", this.toString());
-        request.accumulate("topic_id", topic);
+        request.accumulate("topic_id", topicID);
         this.send(request.toString());
+        this.setSubscribe(topicID, true);
     }
 
-    public void unsubscribe(String topicID) throws IOException, DeviceStandByException, DeviceOfflineException{
+    public void unsubscribe(String topicID) throws IOException, DeviceStandByException, DeviceOfflineException {
         JSONObject request = new JSONObject();
         request.accumulate("request_type", "HTTP");
         request.accumulate("route", "DELETE/SUB");
         request.accumulate("topic_id", topicID);
+        request.accumulate("sub_id", this.toString());
         this.send(request.toString());
+        this.setSubscribe(topicID, false);
+    }
+
+    private void setSubscribe(String topicID, boolean status){
+        for (Topic currentTopic : allTopics) {
+            if(currentTopic.getName().equals(topicID)){
+                currentTopic.setSubscriber(status);
+            }
+        }
     }
     
     @Override
@@ -101,24 +119,4 @@ public class Subscriber extends Device {
         return "SUB:" + this.type + ":" + this.brand + ":" + this.model;
     }
 
-    public void addTopic() {
-        this.allTopics.add(new Topic("Nome exemplo", 10, 25));
-    }
-
-    public void updateTopic(JSONObject response) {
-        Topic topic = this.getTopic(response.getString("topic_id"));
-        topic.addValue(response.getInt("value"));
-        System.out.println("Topic atualizado");
-    }
-
-    public Topic getTopic(String topicID) throws NullPointerException{
-        Iterator<Topic> iterator = this.allTopics.iterator();
-        while(iterator.hasNext()){
-            Topic currentTopic = iterator.next();
-            if(currentTopic.getName().equals(topicID)){
-                return currentTopic;
-            }
-        }
-        throw new NullPointerException();
-    }
 }

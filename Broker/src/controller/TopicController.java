@@ -7,7 +7,6 @@ import java.util.Map;
 import model.Client;
 import model.Topic;
 import model.exceptions.ClientExistException;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -57,7 +56,7 @@ public class TopicController {
         JSONObject topicsJSON = new JSONObject();
         topicsJSON.accumulate("route", "GET/TOPICS");
         topicsJSON.accumulate("qtdTopics", this.topics.size());
-        topicsJSON.put("topics", this.topics.values());        
+        topicsJSON.put("topics", this.topics.values());
         return topicsJSON.toString();
     }
 
@@ -70,8 +69,12 @@ public class TopicController {
      * @throws ClientExistException
      */
     public synchronized void postSubscriber(String topicID, Client subscriber) {
-        Topic topic = this.topics.get(topicID);
-        topic.patchSubscriper(subscriber.getIP(), subscriber);
+        if (this.topics.containsKey(topicID)) {
+            Topic topic = this.topics.get(topicID);
+            if (!topic.containsPublisher(subscriber.getIP())) {
+                topic.patchSubscriper(subscriber.getIP(), subscriber);
+            }
+        }
     }
 
     public synchronized void postPublisher(String topicID, Client publisher) {
@@ -81,19 +84,34 @@ public class TopicController {
 
     public synchronized void deleteSubscripe(String topicID, String subscriperID) throws IOException {
         Topic topic = topics.get(topicID);
-        topic.deleteSubscriper(subscriperID);
+        if (topic != null) {
+            topic.deleteSubscriper(subscriperID);
+        }
     }
 
     public synchronized void updatePublishers(String topicID, String response) {
         this.topics.get(topicID).notifyAllPublisher(response);
     }
 
-    public synchronized String updateSubscriper(JSONObject response) {
+    public synchronized void finalizeTopicsWithoutPublishers() {
+        Iterator<Topic> iterator = this.topics.values().iterator();
+        JSONObject response = new JSONObject();
+        response.accumulate("route", "TOPIC/CLOSE");
+        while (iterator.hasNext()) {
+            Topic currentTopic = iterator.next();
+            if (currentTopic.getPublishers() == 0) {
+                response.accumulate("topic_id", currentTopic.getTopicName());
+                currentTopic.notifyAllSubscripers(response);
+            }
+        }
+    }
+
+    public synchronized String updateSubscribers(JSONObject response) {
         String topicID = response.getString("topic_id");
         if (this.topics.containsKey(response.getString("topic_id"))) {
             this.topics.get(topicID).notifyAllSubscripers(response);
             return "200";
-        }else{
+        } else {
             return "404";
         }
     }
@@ -114,9 +132,9 @@ public class TopicController {
     public void deletePublisher(String publisherID) throws IOException {
         Iterator<Topic> iTopics = this.topics.values().iterator();
         Topic currentTopic;
-        while(iTopics.hasNext()){
+        while (iTopics.hasNext()) {
             currentTopic = (Topic) iTopics.next();
-            if(currentTopic.containsPublisher(publisherID)){
+            if (currentTopic.containsPublisher(publisherID)) {
                 currentTopic.deletePublisher(publisherID);
             }
         }

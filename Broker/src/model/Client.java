@@ -68,16 +68,6 @@ public class Client extends Observable implements Runnable {
         //Instruções relacionadas observer para remover o objeto
     }
 
-    private String read() throws IOException {
-        StringBuilder request = new StringBuilder("");
-        int buffer = -1;
-        while (buffer != '\n') {
-            buffer = reader.read();
-            request.append((char) buffer);
-        }
-        return request.toString();
-    }
-
     public synchronized void write(String response) {
         Runnable send = () -> {
             int uploadAttempets = 5;
@@ -89,7 +79,6 @@ public class Client extends Observable implements Runnable {
                     sended = true;
                     uploadAttempets = 0;
                 } catch (IOException ex) {
-                    System.out.println("Erro ao enviar mensagem::" + response);
                     uploadAttempets--;
                 }
                 try {
@@ -107,7 +96,7 @@ public class Client extends Observable implements Runnable {
         String message;
         while (this.online) {
             try {
-                message = this.read();
+                message = this.reader.readLine();
                 if (message != null && !(message.isEmpty())) {
                     this.setChanged();
                     this.notifyObservers(message);

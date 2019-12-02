@@ -13,6 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import model.exceptions.DeviceOfflineException;
+import model.exceptions.DeviceStandByException;
 import util.Settings.Scenes;
 
 /**
@@ -31,12 +33,13 @@ public class SubscriberDashboardController implements Initializable {
     @FXML
     private VBox vBoxCenterContent;
 
+    private boolean oneTime;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        this.oneTime = true;
     }
 
     @FXML
@@ -55,6 +58,17 @@ public class SubscriberDashboardController implements Initializable {
 
     @FXML
     private void changeScreenAllTopics(ActionEvent event) {
+        if(oneTime){
+            try {
+                FacadeBackend.getInstance().updateListTopics();
+            } catch (IOException ex) {
+                Logger.getLogger(SubscriberDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (DeviceStandByException ex) {
+                Logger.getLogger(SubscriberDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (DeviceOfflineException ex) {
+                Logger.getLogger(SubscriberDashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         try {
             FacadeFrontend.getInstance().changeDashboardContent(Scenes.ALL_TOPICS);
         } catch (Exception ex) {

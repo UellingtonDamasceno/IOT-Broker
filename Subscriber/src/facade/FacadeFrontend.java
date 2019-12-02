@@ -38,16 +38,21 @@ public class FacadeFrontend {
     public void initialize(Stage stage, Scenes scene) throws Exception{        
         this.stageController = new StageController(stage);
         Parent loadedScreen = this.screensController.loadScreen(scene);
-        this.stageController.changeStageContent(loadedScreen);
+        this.stageController.changeMainStage(loadedScreen);
     }
     
     public void changeScreean(Scenes scene) throws Exception{
         Parent loadedScreen = this.screensController.loadScreen(scene);
-        this.stageController.changeStageContent(loadedScreen);
+        this.stageController.changeMainStage(loadedScreen);
     }
     
     public void changeDashboardContent(Scenes scene) throws Exception{
         Parent content = this.screensController.loadScreen(scene);
         sdc.changeContent(content);
+    }
+
+    public void showContentAuxStage(Scenes scenes, String name) throws Exception {
+        Parent content = this.screensController.loadScreen(scenes);
+        this.stageController.changeStageContent(name, content);
     }
 }

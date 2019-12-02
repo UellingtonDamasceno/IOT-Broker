@@ -1,8 +1,9 @@
 package controller.frontend;
 
+import java.util.HashMap;
+import java.util.Map;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 /**
@@ -11,31 +12,31 @@ import javafx.stage.Stage;
  */
 public class StageController {
 
-    private final Stage mainStage;
-    
+    private Map<String, Stage> stages;
+
     public StageController(Stage mainStage) {
-        this.mainStage = mainStage;
-        this.mainStage.setResizable(false);
-        this.mainStage.setTitle("Initial settings");
-//        this.mainStage.getIcons().add(new Image("/resources/icons8-bus-64.png"));
-    }
-
-    public Stage getNewStage(){
-        return new Stage();
+        this.stages = new HashMap();
+        this.stages.put("mainStage", mainStage);
+        mainStage.setResizable(false);
+        mainStage.setTitle("Initial settings");
     }
     
-    public void changeStageContent(Parent content) {
-        this.mainStage.close();
-        this.mainStage.setScene(new Scene(content));
-        this.mainStage.centerOnScreen();
-        this.mainStage.show();
+    public void changeMainStage(Parent content) {
+        this.changeStageContent("mainStage", content);
     }
 
-    public void newAlert(String title, String mensege) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle(title);
-        a.setContentText(mensege);
-        a.show();
+    public void changeStageContent(String stageName, Parent content) {
+        Stage stage;
+        if (this.stages.containsKey(stageName)) {
+            stage = stages.get(stageName);
+        } else {
+            stage = new Stage();
+            stages.put(stageName, stage);
+        }
+        stage.close();
+        stage.setScene(new Scene(content));
+        stage.centerOnScreen();
+        stage.show();
     }
 
 }

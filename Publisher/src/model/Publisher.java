@@ -57,7 +57,8 @@ public class Publisher extends Device {
     public void disconnect() throws IOException {
         JSONObject request = new JSONObject();
         request.accumulate("request_type", "HTTP");
-        request.accumulate("route", "DISCONNECT");
+        request.accumulate("route", "PUB/DISCONNECT");
+        request.accumulate("topic_id", this.toString());
         this.write(request.toString());
     }
 

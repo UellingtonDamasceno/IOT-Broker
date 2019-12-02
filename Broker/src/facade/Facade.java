@@ -58,7 +58,7 @@ public class Facade{
     }
 
     public String updateTopic(JSONObject request) {
-        return this.topicController.updateSubscriper(request);
+        return this.topicController.updateSubscribers(request);
     }
 
 }

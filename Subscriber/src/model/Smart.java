@@ -40,17 +40,6 @@ abstract public class Smart extends Observable implements Runnable {
         this.writer = new BufferedWriter(osw);
     }
 
-    private String read() throws IOException {
-        StringBuilder message = new StringBuilder("");
-        int buffer = -1;
-
-        while (buffer != '\n') {
-            buffer = this.reader.read();
-            message.append(((char) buffer));
-        }
-        return message.toString().trim();
-    }
-
     protected void write(String request) throws IOException {
         this.writer.write(request + '\n');
         this.writer.flush();
@@ -71,7 +60,7 @@ abstract public class Smart extends Observable implements Runnable {
         boolean solving = false;
         while (this.online) {
             try {
-                message = this.read();
+                message = this.reader.readLine();
                 this.setChanged();
                 this.notifyObservers(message);
                 solving = false;

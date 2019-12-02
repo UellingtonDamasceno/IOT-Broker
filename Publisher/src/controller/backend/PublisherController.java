@@ -78,6 +78,7 @@ public class PublisherController extends Observable implements Observer {
 
     @Override
     public void update(Observable o, Object o1) {
+        System.out.println((String)o1);
         this.processResponse((String) o1);
     }
 
